@@ -1,0 +1,4 @@
+__unbound_user: unbound
+__unbound_group: unbound
+__unbound_db_dir: /var/db/unbound
+__unbound_conf_dir: /usr/local/etc/unbound

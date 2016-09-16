@@ -1,0 +1,36 @@
+---
+# tasks file for ansible-role-unbound
+
+- include_vars: "{{ ansible_os_family }}.yml"
+
+- include: "install-{{ ansible_os_family }}.yml"
+
+- name: Create log directory
+  file:
+    path: "{{ unbound_log_dir }}"
+    mode: 0755
+    owner: "{{ unbound_user }}"
+    group: "{{ unbound_group }}"
+    state: directory
+  notify: Restart unbound
+
+- name: Create db directory
+  file:
+    path: "{{ unbound_db_dir }}"
+    mode: 0755
+    owner: "{{ unbound_user }}"
+    group: "{{ unbound_group }}"
+    state: directory
+  notify: Restart unbound
+
+- name: Create unbound.conf
+  template:
+    src: unbound.conf.j2
+    dest: "{{ unbound_conf }}"
+  notify: Restart unbound
+
+- name: Start unbound
+  service:
+    name: "{{ unbound_service }}"
+    enabled: true
+    state: started

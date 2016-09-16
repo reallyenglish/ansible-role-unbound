@@ -1,0 +1,6 @@
+---
+
+- name: Install unbound
+  pkgng:
+    name: unbound
+    state: present

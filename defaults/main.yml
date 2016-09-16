@@ -1,0 +1,7 @@
+unbound_user: unbound
+unbound_group: unbound
+unbound_log_dir: /var/log/unbound
+unbound_db_dir: "{{ __unbound_db_dir }}"
+unbound_service: unbound
+unbound_conf: "{{ __unbound_conf }}"
+unbound_flags: ""
