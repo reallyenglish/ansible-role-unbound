@@ -6,44 +6,45 @@ service = 'unbound'
 config  = '/etc/unbound/unbound.conf'
 user    = 'unbound'
 group   = 'unbound'
-ports   = [ PORTS ]
-log_dir = '/var/log/unbound'
-db_dir  = '/var/lib/unbound'
+ports   = [ 53 ]
 
 case os[:family]
 when 'freebsd'
-  config = '/usr/local/etc/unbound.conf'
-  db_dir = '/var/db/unbound'
+  config = '/usr/local/etc/unbound/unbound.conf'
+when 'openbsd'
+  config = '/var/unbound/etc/unbound.conf'
 end
 
-describe package(package) do
-  it { should be_installed }
-end 
+case os[:family]
+when 'openbsd'
+else
+  describe package(package) do
+    it { should be_installed }
+  end 
+end
 
 describe file(config) do
   it { should be_file }
   its(:content) { should match Regexp.escape('unbound') }
-end
-
-describe file(log_dir) do
-  it { should exist }
-  it { should be_mode 755 }
-  it { should be_owned_by user }
-  it { should be_grouped_into group }
-end
-
-describe file(db_dir) do
-  it { should exist }
-  it { should be_mode 755 }
-  it { should be_owned_by user }
-  it { should be_grouped_into group }
-end
-
-case os[:family]
-when 'freebsd'
-  describe file('/etc/rc.conf.d/unbound') do
-    it { should be_file }
+  its(:content) { should match /interface: / } # XXX
+  its(:content) { should match /outgoing-interface: / } # XXX
+  its(:content) { should match /do-not-query-localhost: yes/ }
+  its(:content) { should match /do-ip4: yes/ }
+  its(:content) { should match /do-ip6: no/ }
+  its(:content) { should match /access-control: #{ Regexp.escape('0.0.0.0/0 refuse')    }/ }
+  its(:content) { should match /access-control: #{ Regexp.escape('127.0.0.0/8 allow')   }/ }
+  its(:content) { should match /access-control: #{ Regexp.escape('10.100.1.0/24 allow') }/ }
+  its(:content) { should match /hide-identity: yes/ }
+  its(:content) { should match /hide-version: yes/ }
+  its(:content) { should match /use-syslog: yes/ }
+  %w[ 10.0.0.0/8 172.16.0.0/12 192.168.0.0/16 192.254.0.0/16 fd00::/8 fe80::/10 ].each do |addr|
+    its(:content) { should match /private-address: #{ Regexp.escape(addr) }/ }
   end
+  its(:content) { should match /private-domain: "example\.com"/ }
+  its(:content) { should match /control-enable: yes/ }
+  its(:content) { should match /control-use-cert: no/ }
+  its(:content) { should match /control-interface: #{ Regexp.escape('/var/run/unbound.sock') }/ }
+  its(:content) { should match /^forward-zone:\n\s+name: "example\.com"\n\s+forward-addr: 8\.8\.8\.8/ }
 end
 
 describe service(service) do

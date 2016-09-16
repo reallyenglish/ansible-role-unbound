@@ -2,4 +2,18 @@
   roles:
     - ansible-role-unbound
   vars:
-    unbound_config: ""
+    unbound_config_interface:
+      - "{{ ansible_default_ipv4.address }}"
+    unbound_config_outgoing_interface: "{{ ansible_default_ipv4.address }}"
+    unbound_config_access_control:
+      - 0.0.0.0/0 refuse
+      - 127.0.0.0/8 allow
+      - 10.100.1.0/24 allow
+    unbound_config_private_domain:
+      - example.com
+    unbound_config_remote_control_control_interface: /var/run/unbound.sock
+    unbound_forward_zone:
+      -
+        name: example.com
+        forward_addr:
+          - 8.8.8.8
