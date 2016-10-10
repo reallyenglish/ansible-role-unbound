@@ -20,4 +20,5 @@ galaxy_info:
 #      - 7
   galaxy_tags:
     - DNS
+    - unbound
 dependencies: []
