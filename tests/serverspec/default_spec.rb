@@ -41,8 +41,12 @@ describe file(config) do
   end
   its(:content) { should match /private-domain: "example\.com"/ }
   its(:content) { should match /control-enable: yes/ }
-  its(:content) { should match /control-use-cert: no/ }
-  its(:content) { should match /control-interface: #{ Regexp.escape('/var/run/unbound.sock') }/ }
+  its(:content) { should match /control-use-cert: no/ } unless os[:family] == 'ubuntu' && os[:release].to_f <= 14.04
+  if os[:family] == 'ubuntu' && os[:release].to_f <= 14.04
+    its(:content) { should match /control-interface: #{ Regexp.escape('127.0.0.1') }/ }
+  else
+    its(:content) { should match /control-interface: #{ Regexp.escape('/var/run/unbound.sock') }/ }
+  end
   its(:content) { should match /^forward-zone:\n\s+name: "example\.com"\n\s+forward-addr: 8\.8\.8\.8/ }
 end
 

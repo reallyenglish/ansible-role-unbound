@@ -34,7 +34,11 @@ server:
 
 remote-control:
   control-enable: {{ unbound_config_remote_control_control_enable }}
+{% if ansible_distribution == 'Ubuntu' and ansible_distribution_version | version_compare('14.04', '<=') %}
+{# unbound in Ubuntu 14.04 does not have this option #}
+{% else %}
   control-use-cert: {{ unbound_config_remote_control_control_use_cert }}
+{% endif %}
   control-interface: {{ unbound_config_remote_control_control_interface }}
 
 {% for zone in unbound_forward_zone %}
