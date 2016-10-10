@@ -14,4 +14,4 @@ gem 'kitchen-verifier-shell', '~> 0.2.0'
 gem 'kitchen-verifier-serverspec', '~> 0.3.0'
 gem 'infrataster', '~> 0.3.2', :git => 'https://github.com/trombik/infrataster.git', :branch => 'reallyenglish'
 gem 'serverspec', '~> 2.31.0'
-gem 'specinfra', '=> 2.63.2' # OpenBSD's `port` is fixed in this version
+gem 'specinfra', '>= 2.63.2' # OpenBSD's `port` is fixed in this version
