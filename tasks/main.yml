@@ -9,6 +9,7 @@
   template:
     src: unbound.conf.j2
     dest: "{{ unbound_conf_file }}"
+    #validate: "unbound-checkconf %s"
   notify: Restart unbound
 
 - name: Start unbound

@@ -1,0 +1,11 @@
+---
+
+- name: Install unbound
+  apt:
+    name: unbound
+    state: present
+
+- name: Install ldnsutils
+  apt:
+    name: ldnsutils
+    state: present
