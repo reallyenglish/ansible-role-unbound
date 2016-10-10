@@ -25,7 +25,6 @@ end
 
 describe file(config) do
   it { should be_file }
-  its(:content) { should match Regexp.escape('unbound') }
   its(:content) { should match /interface: / } # XXX
   its(:content) { should match /outgoing-interface: / } # XXX
   its(:content) { should match /do-not-query-localhost: yes/ }
