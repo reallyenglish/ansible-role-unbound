@@ -1,5 +1,4 @@
 require 'spec_helper'
-require 'serverspec'
 
 package = 'unbound'
 service = 'unbound'
@@ -41,8 +40,15 @@ describe file(config) do
   end
   its(:content) { should match /private-domain: "example\.com"/ }
   its(:content) { should match /control-enable: yes/ }
-  its(:content) { should match /control-use-cert: no/ } unless os[:family] == 'ubuntu' && os[:release].to_f <= 14.04
-  if os[:family] == 'ubuntu' && os[:release].to_f <= 14.04
+  puts os[:family]
+  puts os[:release].to_f
+
+  if (os[:family] == 'ubuntu' && os[:release].to_f <= 14.04) or (os[:family] == 'redhat' && os[:release].to_f <= 7.2)
+    # control-use-cert: is not suppoted
+  else
+    its(:content) { should match /control-use-cert: no/ }
+  end
+  if (os[:family] == 'ubuntu' && os[:release].to_f <= 14.04) or (os[:family] == 'redhat' && os[:release].to_f <= 7.2)
     its(:content) { should match /control-interface: #{ Regexp.escape('127.0.0.1') }/ }
   else
     its(:content) { should match /control-interface: #{ Regexp.escape('/var/run/unbound.sock') }/ }

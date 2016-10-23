@@ -1,7 +1,7 @@
 require 'pathname'
 
 root_dir = Pathname.new(__FILE__).dirname
-integration_test_dir = root_dir + 'test' + 'integration'
+integration_test_dir = root_dir + 'tests' + 'integration'
 integration_test_dirs = Pathname.new(integration_test_dir).children.select { |c| c.directory? }
 
 task default: %w[ test ]
