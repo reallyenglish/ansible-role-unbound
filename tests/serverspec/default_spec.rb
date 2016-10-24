@@ -6,13 +6,27 @@ config  = '/etc/unbound/unbound.conf'
 user    = 'unbound'
 group   = 'unbound'
 ports   = [ 53 ]
+conf_dir = '/etc/unbound'
+directory = ''
+chroot  = ''
+keys    = %w[ unbound_server.key unbound_server.pem unbound_control.key unbound_control.pem ]
+script_dir = '/usr/bin'
 
 case os[:family]
 when 'freebsd'
-  config = '/usr/local/etc/unbound/unbound.conf'
+  conf_dir = '/usr/local/etc/unbound'
+  directory = '/usr/local/etc/unbound'
+  script_dir = '/usr/local/bin'
 when 'openbsd'
-  config = '/var/unbound/etc/unbound.conf'
+  conf_dir = '/var/unbound/etc'
+  directory = '/var/unbound'
+  script_dir = '/usr/local/bin'
+when 'ubuntu'
+  directory = '/etc/unbound'
+when 'redhat'
+  directory = '/etc/unbound'
 end
+config = "#{ conf_dir }/unbound.conf"
 
 case os[:family]
 when 'openbsd'
@@ -24,6 +38,8 @@ end
 
 describe file(config) do
   it { should be_file }
+  its(:content) { should match /directory: "#{ Regexp.escape(directory) }"/ }
+  its(:content) { should match /chroot: "#{ Regexp.escape(chroot) }"/ }
   its(:content) { should match /interface: / } # XXX
   its(:content) { should match /outgoing-interface: / } # XXX
   its(:content) { should match /do-not-query-localhost: yes/ }
@@ -35,6 +51,7 @@ describe file(config) do
   its(:content) { should match /hide-identity: yes/ }
   its(:content) { should match /hide-version: yes/ }
   its(:content) { should match /use-syslog: yes/ }
+  its(:content) { should match /chroot:\s+""$/ }
   %w[ 10.0.0.0/8 172.16.0.0/12 192.168.0.0/16 192.254.0.0/16 fd00::/8 fe80::/10 ].each do |addr|
     its(:content) { should match /private-address: #{ Regexp.escape(addr) }/ }
   end
@@ -65,4 +82,19 @@ ports.each do |p|
   describe port(p) do
     it { should be_listening }
   end
+end
+
+keys.each do |key|
+  describe file "#{ conf_dir }/#{ key }" do
+    it { should be_file }
+  end
+end
+
+describe file(script_dir) do
+  it { should be_directory }
+end
+
+describe file("#{ script_dir }/ansible-unbound-checkconf") do
+  it { should be_file }
+  it { should be_mode 755 }
 end

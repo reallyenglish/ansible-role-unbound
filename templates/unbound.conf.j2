@@ -1,4 +1,6 @@
 server:
+  directory: "{{ unbound_config_directory }}"
+  chroot: "{{ unbound_config_chroot }}"
 {% for i in unbound_config_interface %}
   interface: {{ i }}
 {% endfor %}
@@ -34,14 +36,26 @@ server:
 
 remote-control:
   control-enable: {{ unbound_config_remote_control_control_enable }}
-{% if ansible_distribution == 'Ubuntu' and ansible_distribution_version | version_compare('14.04', '<=') %}
-{# unbound in Ubuntu 14.04 does not have this option #}
-{% elif ansible_distribution == 'CentOS' and ansible_distribution_version | version_compare('7.2.1511', '<=') %}
-{# unbound in CentOS 7.2 does not have this option #}
+{% if (ansible_distribution == 'Ubuntu' and ansible_distribution_version | version_compare('14.04', '<=')) or (ansible_distribution == 'CentOS' and ansible_distribution_version | version_compare('7.2.1511', '<=')) %}
+{# unbound in Ubuntu 14.04 and CentOS does not have control-use-cert #}
 {% else %}
   control-use-cert: {{ unbound_config_remote_control_control_use_cert }}
 {% endif %}
+{% if unbound_config_remote_control_control_interface %}
   control-interface: {{ unbound_config_remote_control_control_interface }}
+{% endif %}
+{% if unbound_config_server_key_file %}
+  server-key-file: {{ unbound_config_server_key_file }}
+{% endif %}
+{% if unbound_config_server_cert_file %}
+  server-cert-file: {{ unbound_config_server_cert_file }}
+{% endif %}
+{% if unbound_config_control_key_file %}
+  control-key-file: {{ unbound_config_control_key_file }}
+{% endif %}
+{% if unbound_config_control_cert_file %}
+  control-cert-file: {{ unbound_config_control_cert_file }}
+{% endif %}
 
 {% for zone in unbound_forward_zone %}
 forward-zone:
