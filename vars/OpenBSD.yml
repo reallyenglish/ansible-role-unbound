@@ -1,3 +1,5 @@
 __unbound_user: _unbound
 __unbound_group: _unbound
 __unbound_conf_dir: /var/unbound/etc
+__unbound_script_dir: /usr/local/bin
+__unbound_config_directory: /var/unbound

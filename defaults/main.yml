@@ -4,7 +4,10 @@ unbound_service: unbound
 unbound_conf_dir: "{{ __unbound_conf_dir }}"
 unbound_conf_file: "{{ __unbound_conf_dir }}/unbound.conf"
 unbound_flags: ""
+unbound_script_dir: "{{ __unbound_script_dir }}"
 
+unbound_config_directory: "{{ __unbound_config_directory }}"
+unbound_config_chroot: ""
 unbound_config_interface: []
 unbound_config_outgoing_interface: ""
 unbound_config_do_not_query_localhost: "yes"
@@ -25,5 +28,10 @@ unbound_config_private_domain: []
 unbound_config_remote_control_control_enable: "yes"
 unbound_config_remote_control_control_use_cert: "no"
 unbound_config_remote_control_control_interface: ""
+
+unbound_config_server_key_file:   "{{ unbound_config_directory }}/unbound_server.key"
+unbound_config_server_cert_file:  "{{ unbound_config_directory }}/unbound_server.pem"
+unbound_config_control_key_file:  "{{ unbound_config_directory }}/unbound_control.key"
+unbound_config_control_cert_file: "{{ unbound_config_directory }}/unbound_control.pem"
 
 unbound_forward_zone: []

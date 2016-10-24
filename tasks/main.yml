@@ -5,11 +5,40 @@
 
 - include: "install-{{ ansible_os_family }}.yml"
 
+- name: Create unbound_script_dir
+  file:
+    path: "{{ unbound_script_dir }}"
+    state: directory
+
+- name: Create ansible-unbound-checkconf
+  copy:
+    dest: "{{ unbound_script_dir }}/ansible-unbound-checkconf"
+    src: ansible-unbound-checkconf.sh
+    mode: 0755
+
+- command: "unbound-control-setup -d {{ unbound_conf_dir }}"
+  # to validate unbound.conf(5), keys must be there even if you do not use them
+  # (control-use-cert: no) because:
+  #
+  # * control-enable is set to "yes", control-use-cert is set to "no"
+  # * (server|control)-(key|cert)-file are not specified because you would not
+  #   use them
+  # * unbound-checkconf validates the file, but it sets default values for
+  #   missing configs, in this case, (server|control)-(key|cert)-file
+  # * unbound-checkconf fails because the files are not there
+  become_user: "{{ unbound_user }}"
+  args:
+    creates:
+      - "{{ unbound_config_server_key_file }}"
+      - "{{ unbound_config_server_cert_file }}"
+      - "{{ unbound_config_control_key_file }}"
+      - "{{ unbound_config_control_cert_file }}"
+
 - name: Create unbound.conf
   template:
     src: unbound.conf.j2
     dest: "{{ unbound_conf_file }}"
-    #validate: "unbound-checkconf %s"
+    validate: "ansible-unbound-checkconf %s"
   notify: Restart unbound
 
 - name: Start unbound
