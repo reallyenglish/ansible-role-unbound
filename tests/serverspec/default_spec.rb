@@ -18,6 +18,8 @@ when 'freebsd'
   directory = '/usr/local/etc/unbound'
   script_dir = '/usr/local/bin'
 when 'openbsd'
+  user = '_unbound'
+  group = '_unbound'
   conf_dir = '/var/unbound/etc'
   directory = '/var/unbound'
   script_dir = '/usr/local/bin'
@@ -98,9 +100,19 @@ ports.each do |p|
   end
 end
 
+describe file(conf_dir) do
+  it { should be_directory }
+  it { should be_owned_by 'root' }
+  it { should be_grouped_into group }
+  it { should be_mode 775 }
+end
+
 keys.each do |key|
   describe file "#{ conf_dir }/#{ key }" do
     it { should be_file }
+    it { should be_owned_by 'root' }
+    it { should be_grouped_into group }
+    it { should be_mode 640 }
   end
 end
 

@@ -16,7 +16,15 @@
     src: ansible-unbound-checkconf.sh
     mode: 0755
 
+- name: Make unbound_conf_dir writable by unbound_user
+  file:
+    path: "{{ unbound_conf_dir }}"
+    mode: 0775
+    owner: root
+    group: "{{ unbound_group }}"
+
 - command: "unbound-control-setup -d {{ unbound_conf_dir }}"
+
   # to validate unbound.conf(5), keys must be there even if you do not use them
   # (control-use-cert: no) because:
   #
@@ -27,12 +35,31 @@
   #   missing configs, in this case, (server|control)-(key|cert)-file
   # * unbound-checkconf fails because the files are not there
   become_user: "{{ unbound_user }}"
+  vars:
+
+    # fix "Failed to set permissions on the temporary files Ansible needs to
+    # create when becoming an unprivileged user" in ansible 2.1
+    #
+    # https://docs.ansible.com/ansible/become.html#becoming-an-unprivileged-user
+    ansible_ssh_pipelining: true
   args:
     creates:
       - "{{ unbound_config_server_key_file }}"
       - "{{ unbound_config_server_cert_file }}"
       - "{{ unbound_config_control_key_file }}"
       - "{{ unbound_config_control_cert_file }}"
+
+- name: Do chgrp unbound_group all keys
+  file:
+    mode: 0640
+    owner: root
+    group: "{{ unbound_group }}"
+    path: "{{ item }}"
+  with_items:
+    - "{{ unbound_config_server_key_file }}"
+    - "{{ unbound_config_server_cert_file }}"
+    - "{{ unbound_config_control_key_file }}"
+    - "{{ unbound_config_control_cert_file }}"
 
 - name: Create unbound.conf
   template:
