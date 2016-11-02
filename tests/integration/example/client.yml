@@ -1,5 +1,5 @@
 ---
-- hosts: example
+- hosts: client
   become: yes 
   become_method: sudo
   environment:
@@ -8,5 +8,8 @@
     no_proxy: "{{ no_proxy | default() }}"
 
   pre_tasks:
+    - name: Install drill
+      openbsd_pkg:
+        name: drill
+        state: present
   roles:
-    - role:
