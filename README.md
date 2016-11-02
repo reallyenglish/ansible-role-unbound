@@ -1,6 +1,13 @@
 # ansible-role-unbound
 
-A brief description of the role goes here.
+Configures `unbound`.
+
+## Notes
+
+The role does not cover all configuration options available in
+`unbound.conf(5)`. The goal of the role is creating a role that reasonably
+works out-of-box with minimum efforts. If you need to configure every options
+supported in `unbound.conf(5)`, This is not for you.
 
 # Requirements
 
@@ -93,6 +100,7 @@ None
   roles:
     - ansible-role-unbound
   vars:
+    unbound_config_chroot: ""
     unbound_config_interface:
       - "{{ ansible_default_ipv4.address }}"
     unbound_config_outgoing_interface: "{{ ansible_default_ipv4.address }}"
@@ -102,11 +110,23 @@ None
       - 10.100.1.0/24 allow
     unbound_config_private_domain:
       - example.com
-    unbound_config_remote_control_control_interface: /var/run/unbound.sock
+    # unbound in ubuntu 14.04 does not support unix socket
+    unbound_config_remote_control_control_interface: "{% if (ansible_distribution == 'Ubuntu' and ansible_distribution_version | version_compare('14.04', '<=')) or (ansible_distribution == 'CentOS' and ansible_distribution_version | version_compare('7.2.1511', '<=')) %}127.0.0.1{% else %}/var/run/unbound.sock{% endif %}"
     unbound_forward_zone:
       -
         name: example.com
         forward_addr:
+          - 8.8.8.8
+      -
+        name: example.org
+        forward_addr:
+          - 8.8.8.8
+    unbound_stub_zone:
+      - name: example.net
+        stub_addr:
+          - 8.8.8.8
+      - name: foo.example
+        stub_addr:
           - 8.8.8.8
 ```
 
