@@ -25,123 +25,13 @@ if ENV['JENKINS_HOME']
 end
 
 Infrataster::Server.define(
-  :foo,
-  'ip.add.re.ss',
+  :client1,
+  '192.168.21.100',
   vagrant: true
 )
 
-def fetch(uri_str, limit = 10)
-  raise ArgumentError, 'too many HTTP redirects' if limit == 0
-  response = Net::HTTP.get_response(URI(uri_str))
-  case response
-  when Net::HTTPSuccess then
-    response
-  when Net::HTTPRedirection then
-    location = response['location']
-    warn "redirected to #{location}"
-    fetch(location, limit - 1)
-  else
-    raise "HTTP response is not success nor redirect (value: #{response.value})"
-  end
-end
-
-def retry_and_sleep(options = {}, &block)
-  opts = {
-    :tries => 60,
-    :sec => 10,
-    :on => [ Exception ],
-    :verbose => false
-  }.merge(options)
-  tries, sec, on, verbose = opts[:tries], opts[:sec], opts[:on], opts[:verbose]
-  i = 1
-  begin
-    yield
-  rescue *on => e
-    warn "rescue an excpetion %s" % [ e.class ] if verbose
-    warn e.message if verbose
-    if (tries -= 1) > 0
-      warn "retrying (remaining: %d)" % [ tries ]
-      warn "sleeping %d sec" % [ sec ] if verbose
-      sleep sec
-      i += 1
-      retry
-    end
-  end
-end
-
-require 'shellwords'
-class Vagrant
-
-  def initialize
-    @status # Process::Status
-    @out
-    @err
-  end
-
-  def up(server)
-    execute('up', '', server)
-  end
-
-  def boot(server)
-    execute('up', '--no-provision', server)
-  end
-
-  def provision(server)
-    execute('provision', '', server)
-  end
-
-  def destroy(server)
-    execute('destroy', '--force', server)
-  end
-
-  def execute(command, opt, server)
-    begin
-      command = "vagrant #{Shellwords.escape(command)}" + ' '
-      command += "#{Shellwords.escape(opt)}" + ' ' if not opt.empty?
-      command += "#{Shellwords.escape(server)}"
-      @out, @err, @status = Open3.capture3(command)
-    rescue SystemCallError => e
-      @status = e
-    end
-    status
-  end
-
-  def status
-    @status
-  end
-
-  def stdout
-    @out
-  end
-
-  def stdout_lines
-    @out.split("\n").to_a
-  end
-
-  def stderr
-    @err
-  end
-
-  def stderr_lines
-    @err.split("\n").to_a
-  end
-
-  def status
-    @status
-  end
-
-  def success?
-    return  false if @success.nil?
-    return false if @status.is_a?(Exception)
-    @status.success?
-  end
-end
-
-RSpec.configure do |config|
-  config.expect_with :rspec do |expectations|
-    expectations.include_chain_clauses_in_custom_matcher_descriptions = true
-  end
-  config.mock_with :rspec do |mocks|
-    mocks.verify_partial_doubles = true
-  end
-end
+Infrataster::Server.define(
+  :resolver1,
+  '192.168.21.254',
+  vagrant: true
+)
