@@ -1,5 +1,5 @@
 server:
-  directory: "{{ unbound_config_directory }}"
+  directory: "{{ unbound_directory }}"
   chroot: "{{ unbound_config_chroot }}"
 {% for i in unbound_config_interface %}
   interface: {{ i }}
@@ -62,5 +62,13 @@ forward-zone:
   name: "{{ zone.name }}"
 {% for addr in zone.forward_addr %}
   forward-addr: {{ addr }}
+{% endfor %}
+{% endfor %}
+
+{% for zone in unbound_stub_zone %}
+stub-zone:
+  name: "{{ zone.name }}"
+{% for addr in zone.stub_addr %}
+  stub-addr: {{ addr }}
 {% endfor %}
 {% endfor %}

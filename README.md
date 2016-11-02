@@ -17,7 +17,7 @@ None
 | unbound\_conf\_file | path to `unbound.conf(5)` | {{ \_\_unbound\_conf\_dir }}/unbound.conf |
 | unbound\_flags | unused | "" |
 | unbound\_script\_dir | directory to install scripts in `files` | {{ \_\_unbound\_script\_dir }} |
-| unbound\_config\_directory | work directory | {{ \_\_unbound\_config\_directory }} |
+| unbound\_directory | work directory | {{ \_\_unbound\_directory }} |
 | unbound\_config\_chroot | path to chroot directory | "" |
 | unbound\_script\_dir | directory to keep support script. this must be included in PATH environment variable. | {{ \_\_unbound\_script\_dir }} |
 | unbound\_config\_interface | `interface` to listen on | [] |
@@ -39,6 +39,7 @@ None
 | unbound\_config\_control\_key\_file | `control-key-file` | {{ unbound\_config\_directory }}/unbound\_control.key |
 | unbound\_config\_control\_cert\_file | `control-cert-file` | {{ unbound\_config\_directory }}/unbound\_control.pem |
 | unbound\_forward\_zone | `forward-zone` | [] |
+
 ## Debian
 
 | Variable | Default |
@@ -47,7 +48,7 @@ None
 | \_\_unbound\_group | unbound |
 | \_\_unbound\_conf\_dir | /etc/unbound |
 | \_\_unbound\_script\_dir | /usr/bin |
-| \_\_unbound\_config\_directory | /etc/unbound |
+| \_\_unbound\_directory | /etc/unbound |
 
 ## FreeBSD
 
@@ -57,7 +58,7 @@ None
 | \_\_unbound\_group | unbound |
 | \_\_unbound\_conf\_dir | /usr/local/etc/unbound |
 | \_\_unbound\_script\_dir | /usr/local/bin |
-| \_\_unbound\_config\_directory | /usr/local/etc/unbound |
+| \_\_unbound\_directory | /usr/local/etc/unbound |
 
 ## OpenBSD
 
@@ -67,7 +68,7 @@ None
 | \_\_unbound\_group | \_unbound |
 | \_\_unbound\_conf\_dir | /var/unbound/etc |
 | \_\_unbound\_script\_dir | /usr/local/bin |
-| \_\_unbound\_config\_directory | /var/unbound |
+| \_\_unbound\_directory | /var/unbound |
 
 ## RedHat
 
@@ -77,7 +78,7 @@ None
 | \_\_unbound\_group | unbound |
 | \_\_unbound\_conf\_dir | /etc/unbound |
 | \_\_unbound\_script\_dir | /usr/bin |
-| \_\_unbound\_config\_directory | /etc/unbound |
+| \_\_unbound\_directory | /etc/unbound |
 
 Created by [yaml2readme.rb](https://gist.github.com/trombik/b2df709657c08d845b1d3b3916e592d3)
 
