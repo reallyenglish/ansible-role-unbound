@@ -38,39 +38,53 @@ end
 
 describe file(config) do
   it { should be_file }
-  its(:content) { should match /directory: "#{ Regexp.escape(directory) }"/ }
-  its(:content) { should match /chroot: "#{ Regexp.escape(chroot) }"/ }
-  its(:content) { should match /interface: / } # XXX
-  its(:content) { should match /outgoing-interface: / } # XXX
-  its(:content) { should match /do-not-query-localhost: yes/ }
-  its(:content) { should match /do-ip4: yes/ }
-  its(:content) { should match /do-ip6: no/ }
+
+  # server
+  its(:content_as_yaml) { should include('server' => include('interface' => '10.0.2.15')) }
+  its(:content_as_yaml) { should include('server' => include('directory' => directory)) }
+  its(:content_as_yaml) { should include('server' => include('chroot' => '')) }
+  its(:content_as_yaml) { should include('server' => include('outgoing-interface' => '10.0.2.15')) }
+  its(:content_as_yaml) { should include('server' => include('do-not-query-localhost' => true)) }
+  its(:content_as_yaml) { should include('server' => include('do-ip4' => true)) }
+  its(:content_as_yaml) { should include('server' => include('do-ip6' => false)) }
+  its(:content_as_yaml) { should include('server' => include('hide-identity' => true)) }
+  its(:content_as_yaml) { should include('server' => include('hide-version' => true)) }
+  its(:content_as_yaml) { should include('server' => include('use-syslog' => true)) }
   its(:content) { should match /access-control: #{ Regexp.escape('0.0.0.0/0 refuse')    }/ }
   its(:content) { should match /access-control: #{ Regexp.escape('127.0.0.0/8 allow')   }/ }
   its(:content) { should match /access-control: #{ Regexp.escape('10.100.1.0/24 allow') }/ }
-  its(:content) { should match /hide-identity: yes/ }
-  its(:content) { should match /hide-version: yes/ }
-  its(:content) { should match /use-syslog: yes/ }
-  its(:content) { should match /chroot:\s+""$/ }
   %w[ 10.0.0.0/8 172.16.0.0/12 192.168.0.0/16 192.254.0.0/16 fd00::/8 fe80::/10 ].each do |addr|
     its(:content) { should match /private-address: #{ Regexp.escape(addr) }/ }
   end
   its(:content) { should match /private-domain: "example\.com"/ }
-  its(:content) { should match /control-enable: yes/ }
-  puts os[:family]
-  puts os[:release].to_f
 
+  # remote-control
+  its(:content_as_yaml) { should include('remote-control' => include('control-enable' => true)) }
   if (os[:family] == 'ubuntu' && os[:release].to_f <= 14.04) or (os[:family] == 'redhat' && os[:release].to_f <= 7.2)
     # control-use-cert: is not suppoted
   else
-    its(:content) { should match /control-use-cert: no/ }
+    its(:content_as_yaml) { should include('remote-control' => include('control-use-cert' => false)) }
+    keys.each do |key|
+      name, ext = key.split('.')
+      type = name.gsub('unbound_', '')
+      ext.gsub!('pem', 'cert')
+      its(:content_as_yaml) { should include('remote-control' => include("#{ type }-#{ ext }-file" => "#{ conf_dir }/#{ key }")) }
+    end
   end
   if (os[:family] == 'ubuntu' && os[:release].to_f <= 14.04) or (os[:family] == 'redhat' && os[:release].to_f <= 7.2)
-    its(:content) { should match /control-interface: #{ Regexp.escape('127.0.0.1') }/ }
+    its(:content_as_yaml) { should include('remote-control' => include('control-interface' => '127.0.0.1')) }
   else
-    its(:content) { should match /control-interface: #{ Regexp.escape('/var/run/unbound.sock') }/ }
+    its(:content_as_yaml) { should include('remote-control' => include('control-interface' => '/var/run/unbound.sock')) }
   end
+
+  # forward-zone
   its(:content) { should match /^forward-zone:\n\s+name: "example\.com"\n\s+forward-addr: 8\.8\.8\.8/ }
+  its(:content) { should match /^forward-zone:\n\s+name: "example\.org"\n\s+forward-addr: 8\.8\.8\.8/ }
+
+  # stub-zone
+  its(:content) { should match /^stub-zone:\n\s+name: "example\.net"\n\s+stub-addr: 8\.8\.8\.8/ }
+  its(:content) { should match /^stub-zone:\n\s+name: "foo\.example"\n\s+stub-addr: 8\.8\.8\.8/ }
+
 end
 
 describe service(service) do

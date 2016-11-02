@@ -19,3 +19,14 @@
         name: example.com
         forward_addr:
           - 8.8.8.8
+      -
+        name: example.org
+        forward_addr:
+          - 8.8.8.8
+    unbound_stub_zone:
+      - name: example.net
+        stub_addr:
+          - 8.8.8.8
+      - name: foo.example
+        stub_addr:
+          - 8.8.8.8
