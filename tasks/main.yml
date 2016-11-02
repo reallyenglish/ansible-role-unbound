@@ -23,7 +23,10 @@
     owner: root
     group: "{{ unbound_group }}"
 
-- command: "unbound-control-setup -d {{ unbound_conf_dir }}"
+- name: Create key files
+  command: "unbound-control-setup -d {{ unbound_conf_dir }}"
+  args:
+    creates: "{{ unbound_config_server_key_file }}"
 
   # to validate unbound.conf(5), keys must be there even if you do not use them
   # (control-use-cert: no) because:
@@ -42,12 +45,6 @@
     #
     # https://docs.ansible.com/ansible/become.html#becoming-an-unprivileged-user
     ansible_ssh_pipelining: true
-  args:
-    creates:
-      - "{{ unbound_config_server_key_file }}"
-      - "{{ unbound_config_server_cert_file }}"
-      - "{{ unbound_config_control_key_file }}"
-      - "{{ unbound_config_control_cert_file }}"
 
 - name: Do chgrp unbound_group all keys
   file:
