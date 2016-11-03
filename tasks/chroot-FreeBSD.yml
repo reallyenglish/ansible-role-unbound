@@ -9,12 +9,16 @@
       - unbound_chroot_dev_dir != '/dev'
 
 - name: Copy mk_chroot
+
+  # this script creates chroot environment
   copy:
     src: files/chroot/FreeBSD/mk_chroot.sh
     dest: "{{ unbound_script_dir }}/mk_chroot"
     mode: 0755
 
 - name: Copy files/chroot/FreeBSD/chroot_unbound.sh
+
+  # this is the service that invoke mk_chroot and runs as a service at boot
   copy:
     src: files/chroot/FreeBSD/chroot_unbound.sh
     dest: /usr/local/etc/rc.d/chroot_unbound
