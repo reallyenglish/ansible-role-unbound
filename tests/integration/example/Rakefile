@@ -74,7 +74,7 @@ end
 
 desc 'prepare role'
 task :prepare_role do
-  ignore_files = %w[ vendor .kitchen .git test spec ].map { |f| "#{role_name}/#{f}" }
+  ignore_files = %w[ vendor .kitchen .git tests spec ].map { |f| "#{role_name}/#{f}" }
   tmpfile = Tempfile.new('.tarignore')
   tmpfile.write ignore_files.join("\n")
   tmpfile.close
