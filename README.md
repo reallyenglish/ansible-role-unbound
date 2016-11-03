@@ -9,6 +9,13 @@ The role does not cover all configuration options available in
 works out-of-box with minimum efforts. If you need to configure every options
 supported in `unbound.conf(5)`, This is not for you.
 
+## chroot support
+
+When `unbound_config_chroot` is not empty, the role creates necessary files for
+unbound. Supported platform includes:
+
+* OpenBSD
+
 # Requirements
 
 None

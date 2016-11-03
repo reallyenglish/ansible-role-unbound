@@ -60,3 +60,12 @@ suites:
     verifier:
       name: shell
       command: rspec -c -f d -I tests/serverspec tests/serverspec/default_spec.rb
+
+  - name: chroot
+    provisioner:
+      name: ansible_playbook
+      playbook: tests/serverspec/chroot.yml
+    verifier:
+      name: shell
+      command: rspec -c -f d -I tests/serverspec tests/serverspec/chroot_spec.rb
+    includes: openbsd-6.0-amd64
