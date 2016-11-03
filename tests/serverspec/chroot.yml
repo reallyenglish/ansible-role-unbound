@@ -2,7 +2,7 @@
   roles:
     - ansible-role-unbound
   vars:
-    unbound_config_chroot: "{% if ansible_os_family == 'OpenBSD' %}/var/unbound{% endif %}"
+    unbound_config_chroot: "{% if ansible_os_family == 'OpenBSD' %}/var/unbound{% elif ansible_os_family == 'FreeBSD' %}/usr/local/etc/unbound{% endif %}"
     unbound_config_outgoing_interface: "{{ ansible_default_ipv4.address }}"
     unbound_config_access_control:
       - 0.0.0.0/0 refuse

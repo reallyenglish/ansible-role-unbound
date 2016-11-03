@@ -68,4 +68,6 @@ suites:
     verifier:
       name: shell
       command: rspec -c -f d -I tests/serverspec tests/serverspec/chroot_spec.rb
-    includes: openbsd-6.0-amd64
+    includes:
+      - freebsd-10.3-amd64
+      - openbsd-6.0-amd64

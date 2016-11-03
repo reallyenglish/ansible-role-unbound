@@ -12,12 +12,14 @@ chroot  = ''
 keys    = %w[ unbound_server.key unbound_server.pem unbound_control.key unbound_control.pem ]
 script_dir = '/usr/bin'
 chroot_dir = ''
+unbound_freebsd_chroot_devfs_ruleset_number = 100
 
 case os[:family]
 when 'freebsd'
   conf_dir = '/usr/local/etc/unbound'
   directory = '/usr/local/etc/unbound'
   script_dir = '/usr/local/bin'
+  chroot_dir = '/usr/local/etc/unbound'
 when 'openbsd'
   user = '_unbound'
   group = '_unbound'
@@ -41,7 +43,71 @@ else
 end
 
 case os[:family]
+when 'freebsd'
+
+  describe file("/usr/local/etc/rc.d/chroot_unbound") do
+    it { should be_file }
+    it { should be_mode 755 }
+  end
+
+  describe file("/etc/rc.conf.d/chroot_unbound") do
+    it { should be_file }
+    its(:content) { should match(/chroot_unbound_enable="YES"/) }
+    its(:content) { should match(/chroot_unbound_flags="#{ Regexp.escape('/usr/local/etc/unbound') } 100"/) }
+  end
+
+  describe service("chroot_unbound") do
+    it { should be_enabled }
+  end
+
+  describe file('/usr/local/bin/mk_chroot') do
+    it { should be_file }
+    it { should be_mode 755 }
+  end
+
+  describe file("#{ chroot_dir }/dev") do
+    it { should be_directory }
+    it { should be_mounted }
+  end
+
+  describe command("devfs -m #{ chroot_dir }/dev rule show") do
+    its(:exit_status) { should eq 0 }
+    its(:stdout) { should match(/^100 hide$/) }
+    its(:stdout) { should match(/^200 path random unhide$/) }
+    its(:stdout) { should match(/^300 path urandom unhide$/) }
+    its(:stderr) { should match(/^$/) }
+  end
+
+  describe command("devfs rule -s #{ unbound_freebsd_chroot_devfs_ruleset_number } show") do
+    its(:exit_status) { should eq 0 }
+    its(:stdout) { should match(/^100 hide$/) }
+    its(:stdout) { should match(/^200 path random unhide$/) }
+    its(:stdout) { should match(/^300 path urandom unhide$/) }
+    its(:stderr) { should match(/^$/) }
+  end
+
+  describe command("devfs rule showsets") do
+    its(:exit_status) { should eq 0 }
+    its(:stdout) { should match(/^#{ Regexp.escape(unbound_freebsd_chroot_devfs_ruleset_number.to_s) }$/) }
+    its(:stderr) { should match(/^$/) }
+  end
+
+  devices = %w[
+    random
+    urandom
+  ]
+  devices.each do |dev|
+    describe file("#{ chroot_dir }/dev/#{ dev }") do
+      it { should be_character_device }
+    end
+  end
+
+  describe file("#{ chroot_dir }/dev/console") do
+    it { should_not exist }
+  end
+
 when 'openbsd'
+
   describe file("#{ chroot_dir }/dev") do
     it { should be_mounted }
   end
@@ -68,6 +134,7 @@ when 'openbsd'
   describe file('/etc/rc.local') do
     its(:content) { should match(Regexp.escape('[ -x /usr/local/bin/mk_chroot ] && /usr/local/bin/mk_chroot /var/unbound')) }
   end
+
 end
 
 describe file(config) do
@@ -138,4 +205,19 @@ end
 describe file("#{ script_dir }/ansible-unbound-checkconf") do
   it { should be_file }
   it { should be_mode 755 }
+end
+
+case os[:family]
+when 'freebsd'
+  describe command("drill example.com @127.0.0.1") do
+    its(:stdout) { should match(/;; flags: qr rd ra ; QUERY: 1, ANSWER: [1-9]+, AUTHORITY: \d+, ADDITIONAL: \d+/) }
+    its(:stdout) { should match(/;; ANSWER SECTION:\n#{ Regexp.escape('example.com.') }\s+\d+\s+IN\s+A\s+\d.*/) }
+    its(:stderr) { should match(/^$/) }
+  end
+when 'openbsd'
+  describe command("dig example.com @127.0.0.1") do
+    its(:stdout) { should match(/;; flags: qr rd ra; QUERY: 1, ANSWER: [1-9]+, AUTHORITY: \d+, ADDITIONAL: \d+/) }
+    its(:stdout) { should match(/;; ANSWER SECTION:\n#{ Regexp.escape('example.com.') }\s+\d+\s+IN\s+A\s+\d.*/) }
+    its(:stderr) { should match(/^$/) }
+  end
 end
