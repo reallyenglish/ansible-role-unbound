@@ -9,6 +9,14 @@ The role does not cover all configuration options available in
 works out-of-box with minimum efforts. If you need to configure every options
 supported in `unbound.conf(5)`, This is not for you.
 
+## chroot support
+
+When `unbound_config_chroot` is not empty, the role creates necessary files for
+unbound. Supported platform includes:
+
+* OpenBSD
+* FreeBSD
+
 # Requirements
 
 None
@@ -26,6 +34,7 @@ None
 | unbound\_script\_dir | directory to install scripts in `files` | {{ \_\_unbound\_script\_dir }} |
 | unbound\_directory | work directory | {{ \_\_unbound\_directory }} |
 | unbound\_config\_chroot | path to chroot directory | "" |
+| unbound\_freebsd\_chroot\_devfs\_ruleset\_number | `devfs(8)` rule set number. Change when unbound\_config\_chroot is not empty and you have other `devfs(8)` rule set with the same number. | 100 |
 | unbound\_script\_dir | directory to keep support script. this must be included in PATH environment variable. | {{ \_\_unbound\_script\_dir }} |
 | unbound\_config\_interface | `interface` to listen on | [] |
 | unbound\_config\_outgoing\_interface | `outgoing-interface` | "" |

@@ -5,6 +5,10 @@
 
 - include: "install-{{ ansible_os_family }}.yml"
 
+- include: "chroot-{{ ansible_os_family }}.yml"
+  when:
+    - unbound_config_chroot != ''
+
 - name: Create unbound_script_dir
   file:
     path: "{{ unbound_script_dir }}"

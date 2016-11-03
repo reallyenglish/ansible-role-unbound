@@ -1,0 +1,99 @@
+---
+
+- set_fact:
+    unbound_chroot_dev_dir: "{{ unbound_config_chroot }}/dev"
+
+- assert:
+    that:
+      - unbound_config_chroot | length > 0
+      - unbound_chroot_dev_dir != '/dev'
+
+- name: Copy mk_chroot
+
+  # this script creates chroot environment
+  copy:
+    src: files/chroot/FreeBSD/mk_chroot.sh
+    dest: "{{ unbound_script_dir }}/mk_chroot"
+    mode: 0755
+
+- name: Copy files/chroot/FreeBSD/chroot_unbound.sh
+
+  # this is the service that invoke mk_chroot and runs as a service at boot
+  copy:
+    src: files/chroot/FreeBSD/chroot_unbound.sh
+    dest: /usr/local/etc/rc.d/chroot_unbound
+    mode: 0755
+
+- name: Create chroot_unbound.rc.conf
+  template:
+    src: chroot_unbound.rc.conf.j2
+    dest: /etc/rc.conf.d/chroot_unbound
+    validate: "sh -n %s"
+
+- name: Create dev mount point in chroot directory
+  file:
+    path: "{{ unbound_chroot_dev_dir }}"
+    state: directory
+
+- name: Test if devfs is mounted
+  command: mount -t devfs
+  register: register_mount
+  changed_when: false
+
+- name: Mount devfs unbound_chroot_dev_dir
+  command: "mount -t devfs devfs {{ unbound_chroot_dev_dir }}"
+  when: "unbound_chroot_dev_dir not in register_mount.stdout"
+
+- name: Check if ruleset number unbound_freebsd_chroot_devfs_ruleset_number exists
+  command: "devfs rule showsets"
+  register: register_devfs_rule_showsets
+  changed_when: false
+
+- name: Create rule set for unbound
+  command: "devfs -m {{ unbound_chroot_dev_dir }} ruleset {{ unbound_freebsd_chroot_devfs_ruleset_number }}"
+  when: "unbound_freebsd_chroot_devfs_ruleset_number | string not in register_devfs_rule_showsets.stdout"
+
+- name: Check if ruleset unbound_freebsd_chroot_devfs_ruleset_number contains path random unhide
+  command: "devfs rule -s {{ unbound_freebsd_chroot_devfs_ruleset_number }} show"
+  register: register_devfs_rule
+  changed_when: false
+
+- name: Create devfs rule hide
+  command: "devfs -m {{ unbound_chroot_dev_dir }} rule add 100 hide"
+  register: register_devfs_random
+  when: "'100 hide' not in register_devfs_rule.stdout"
+
+- name: Create devfs rule path random unhide
+  command: "devfs -m {{ unbound_chroot_dev_dir }} rule add 200 path random unhide"
+  register: register_devfs_random
+  when: "'200 path random unhide' not in register_devfs_rule.stdout"
+
+- name: Create devfs rule path urandom unhide
+  command: "devfs -m {{ unbound_chroot_dev_dir }} rule add 300 path urandom unhide"
+  register: register_devfs_urandom
+  when: "'300 path urandom unhide' not in register_devfs_rule.stdout"
+
+- name: Apply the ruleset
+  command: "devfs -m {{ unbound_chroot_dev_dir }} rule applyset"
+  when: "register_devfs_urandom.changed or register_devfs_random.changed"
+
+- name: Check if unbound_chroot_dev_dir/random exists
+  stat:
+    path: "{{ unbound_chroot_dev_dir }}/random"
+  register: register_stat_random
+
+- name: Check if unbound_chroot_dev_dir/urandom exists
+  stat:
+    path: "{{ unbound_chroot_dev_dir }}/urandom"
+  register: register_stat_urandom
+
+- name: Check if unbound_chroot_dev_dir/console exists
+  stat:
+    path: "{{ unbound_chroot_dev_dir }}/console"
+  register: register_stat_console
+
+- assert:
+    that:
+      - register_stat_random.stat.exists
+      - register_stat_urandom.stat.exists
+      - not register_stat_console.stat.exists
