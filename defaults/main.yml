@@ -11,7 +11,7 @@ unbound_config_chroot: ""
 unbound_freebsd_chroot_devfs_ruleset_number: 100
 
 unbound_config_interface: []
-unbound_config_mount point outgoing_interface: ""
+unbound_config_outgoing_interface: ""
 unbound_config_do_not_query_localhost: "yes"
 unbound_config_do_ip4: "yes"
 unbound_config_do_ip6: "no"
