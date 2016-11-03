@@ -12,7 +12,7 @@
     - ansible-role-unbound
 
   vars:
-    unbound_config_chroot: ""
+    unbound_config_chroot: "/var/unbound"
     unbound_config_interface: "{{ ansible_all_ipv4_addresses }}"
     unbound_config_outgoing_interface: "{{ ansible_default_ipv4.address }}"
     unbound_config_access_control:
