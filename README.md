@@ -120,7 +120,7 @@ None
     unbound_config_private_domain:
       - example.com
     # unbound in ubuntu 14.04 does not support unix socket
-    unbound_config_remote_control_control_interface: "{% if (ansible_distribution == 'Ubuntu' and ansible_distribution_version | version_compare('14.04', '<=')) or (ansible_distribution == 'CentOS' and ansible_distribution_version | version_compare('7.2.1511', '<=')) %}127.0.0.1{% else %}/var/run/unbound.sock{% endif %}"
+    unbound_config_remote_control_control_interface: "{% if (ansible_distribution == 'Ubuntu' and ansible_distribution_version | version_compare('14.04', '<=')) or (ansible_distribution == 'CentOS' and ansible_distribution_version | version_compare('7.3.1611', '<=')) %}127.0.0.1{% else %}/var/run/unbound.sock{% endif %}"
     unbound_forward_zone:
       -
         name: example.com
