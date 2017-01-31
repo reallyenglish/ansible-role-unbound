@@ -73,7 +73,6 @@ describe file(config) do
       its(:content_as_yaml) { should include('remote-control' => include("#{ type }-#{ ext }-file" => "#{ conf_dir }/#{ key }")) }
     end
   end
-  puts os[:release]
   if (os[:family] == 'ubuntu' && os[:release].to_f <= 14.04) or (os[:family] == 'redhat' && os[:release].to_f <= 7.3)
     its(:content_as_yaml) { should include('remote-control' => include('control-interface' => '127.0.0.1')) }
   else
