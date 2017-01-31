@@ -62,7 +62,7 @@ describe file(config) do
 
   # remote-control
   its(:content_as_yaml) { should include('remote-control' => include('control-enable' => true)) }
-  if (os[:family] == 'ubuntu' && os[:release].to_f <= 14.04) or (os[:family] == 'redhat' && os[:release].to_f <= 7.2)
+  if (os[:family] == 'ubuntu' && os[:release].to_f <= 14.04) or (os[:family] == 'redhat' && os[:release].to_f <= 7.3)
     # control-use-cert: is not suppoted
   else
     its(:content_as_yaml) { should include('remote-control' => include('control-use-cert' => false)) }
@@ -73,7 +73,7 @@ describe file(config) do
       its(:content_as_yaml) { should include('remote-control' => include("#{ type }-#{ ext }-file" => "#{ conf_dir }/#{ key }")) }
     end
   end
-  if (os[:family] == 'ubuntu' && os[:release].to_f <= 14.04) or (os[:family] == 'redhat' && os[:release].to_f <= 7.2)
+  if (os[:family] == 'ubuntu' && os[:release].to_f <= 14.04) or (os[:family] == 'redhat' && os[:release].to_f <= 7.3)
     its(:content_as_yaml) { should include('remote-control' => include('control-interface' => '127.0.0.1')) }
   else
     its(:content_as_yaml) { should include('remote-control' => include('control-interface' => '/var/run/unbound.sock')) }

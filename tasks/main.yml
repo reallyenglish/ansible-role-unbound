@@ -5,6 +5,21 @@
 
 - include: "install-{{ ansible_os_family }}.yml"
 
+- name: Register unbound version
+  shell: "unbound -h | grep -E '^Version[[:space:]]+[[:digit:].]+$' | cut -f 2 -d' '"
+  register: register_unbound_version
+  changed_when: false
+
+- set_fact:
+    # unbound_version is available for use from this point. note that this
+    # fact, unlike facts defined by "setup" action, cannot be used in playbooks,
+    # group_var, etc.
+    unbound_version: "{{ register_unbound_version.stdout }}"
+
+- assert:
+    that:
+      - unbound_version | match('\d+[\d.]+\d+')
+
 - include: "chroot-{{ ansible_os_family }}.yml"
   when:
     - unbound_config_chroot != ''
