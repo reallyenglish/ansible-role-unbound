@@ -18,7 +18,7 @@
 
 - assert:
     that:
-      - unbound_version | match('[\d.]+')
+      - unbound_version | match('\d+[\d.]+\d+')
 
 - include: "chroot-{{ ansible_os_family }}.yml"
   when:
