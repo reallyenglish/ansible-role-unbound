@@ -35,7 +35,7 @@ when 'openbsd'
 else
   describe package(package) do
     it { should be_installed }
-  end 
+  end
 end
 
 describe file(config) do
@@ -44,7 +44,6 @@ describe file(config) do
   # server
   its(:content_as_yaml) { should include('server' => include('interface' => '10.0.2.15')) }
   its(:content_as_yaml) { should include('server' => include('directory' => directory)) }
-  its(:content_as_yaml) { should include('server' => include('chroot' => '')) }
   its(:content_as_yaml) { should include('server' => include('outgoing-interface' => '10.0.2.15')) }
   its(:content_as_yaml) { should include('server' => include('do-not-query-localhost' => true)) }
   its(:content_as_yaml) { should include('server' => include('do-ip4' => true)) }
@@ -59,6 +58,7 @@ describe file(config) do
     its(:content) { should match /private-address: #{ Regexp.escape(addr) }/ }
   end
   its(:content) { should match /private-domain: "example\.com"/ }
+  its(:content) { should_not include('chroot') }
 
   # remote-control
   its(:content_as_yaml) { should include('remote-control' => include('control-enable' => true)) }

@@ -1,6 +1,8 @@
 server:
   directory: "{{ unbound_directory }}"
+{% if unbound_config_chroot and unbound_config_chroot != '' %}
   chroot: "{{ unbound_config_chroot }}"
+{% endif %}
 {% for i in unbound_config_interface %}
   interface: {{ i }}
 {% endfor %}
