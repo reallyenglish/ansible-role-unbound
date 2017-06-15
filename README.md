@@ -121,25 +121,24 @@ None
     unbound_config_private_domain:
       - example.com
     unbound_config_local_zone:
-      - "10.in-addr.arpa" nodefault
-      - "168.192.in-addr.arpa" nodefault
-      - "16.172.in-addr.arpa" nodefault
-      - "17.172.in-addr.arpa" nodefault
-      - "18.172.in-addr.arpa" nodefault
-      - "19.172.in-addr.arpa" nodefault
-      - "20.172.in-addr.arpa" nodefault
-      - "21.172.in-addr.arpa" nodefault
-      - "22.172.in-addr.arpa" nodefault
-      - "23.172.in-addr.arpa" nodefault
-      - "24.172.in-addr.arpa" nodefault
-      - "25.172.in-addr.arpa" nodefault
-      - "26.172.in-addr.arpa" nodefault
-      - "27.172.in-addr.arpa" nodefault
-      - "28.172.in-addr.arpa" nodefault
-      - "29.172.in-addr.arpa" nodefault
-      - "30.172.in-addr.arpa" nodefault
-      - "31.172.in-addr.arpa" nodefault
-      - "32.172.in-addr.arpa" nodefault
+      - "10.in-addr.arpa nodefault"
+      - "168.192.in-addr.arpa nodefault"
+      - "17.172.in-addr.arpa nodefault"
+      - "18.172.in-addr.arpa nodefault"
+      - "19.172.in-addr.arpa nodefault"
+      - "20.172.in-addr.arpa nodefault"
+      - "21.172.in-addr.arpa nodefault"
+      - "22.172.in-addr.arpa nodefault"
+      - "23.172.in-addr.arpa nodefault"
+      - "24.172.in-addr.arpa nodefault"
+      - "25.172.in-addr.arpa nodefault"
+      - "26.172.in-addr.arpa nodefault"
+      - "27.172.in-addr.arpa nodefault"
+      - "28.172.in-addr.arpa nodefault"
+      - "29.172.in-addr.arpa nodefault"
+      - "30.172.in-addr.arpa nodefault"
+      - "31.172.in-addr.arpa nodefault"
+      - "32.172.in-addr.arpa nodefault"
     # unbound in ubuntu 14.04 does not support unix socket
     unbound_config_remote_control_control_interface: "{% if (ansible_distribution == 'Ubuntu' and ansible_distribution_version | version_compare('14.04', '<=')) or (ansible_distribution == 'CentOS' and ansible_distribution_version | version_compare('7.3.1611', '<=')) %}127.0.0.1{% else %}/var/run/unbound.sock{% endif %}"
     unbound_forward_zone:
