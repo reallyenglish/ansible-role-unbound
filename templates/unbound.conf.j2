@@ -22,6 +22,10 @@ server:
   hide-version: {{ unbound_config_hide_version }}
   use-syslog: {{ unbound_config_use_syslog }}
 
+{% for lz in unbound_config_local_zone %}
+  local-zone: {{ lz }}
+{% endfor %}
+
 {% for addr in unbound_config_private_address %}
   private-address: {{ addr }}
 {% endfor %}
