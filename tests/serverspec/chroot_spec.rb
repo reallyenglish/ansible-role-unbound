@@ -75,7 +75,7 @@ when "freebsd"
     its(:stdout) { should match(/^100 hide$/) }
     its(:stdout) { should match(/^200 path random unhide$/) }
     its(:stdout) { should match(/^300 path urandom unhide$/) }
-    its(:stderr) { should match(/^$/) }
+    its(:stderr) { should eq "" }
   end
 
   describe command("devfs rule -s #{unbound_freebsd_chroot_devfs_ruleset_number} show") do
@@ -83,13 +83,13 @@ when "freebsd"
     its(:stdout) { should match(/^100 hide$/) }
     its(:stdout) { should match(/^200 path random unhide$/) }
     its(:stdout) { should match(/^300 path urandom unhide$/) }
-    its(:stderr) { should match(/^$/) }
+    its(:stderr) { should eq "" }
   end
 
   describe command("devfs rule showsets") do
     its(:exit_status) { should eq 0 }
     its(:stdout) { should match(/^#{ Regexp.escape(unbound_freebsd_chroot_devfs_ruleset_number.to_s) }$/) }
-    its(:stderr) { should match(/^$/) }
+    its(:stderr) { should eq "" }
   end
 
   devices = %w(
@@ -208,14 +208,16 @@ end
 case os[:family]
 when "freebsd"
   describe command("drill example.com @127.0.0.1") do
+    its(:exit_status) { should eq 0 }
     its(:stdout) { should match(/;; flags: qr rd ra ; QUERY: 1, ANSWER: [1-9]+, AUTHORITY: \d+, ADDITIONAL: \d+/) }
     its(:stdout) { should match(/;; ANSWER SECTION:\n#{ Regexp.escape('example.com.') }\s+\d+\s+IN\s+A\s+\d.*/) }
-    its(:stderr) { should match(/^$/) }
+    its(:stderr) { should eq "" }
   end
 when "openbsd"
   describe command("dig example.com @127.0.0.1") do
+    its(:exit_status) { should eq 0 }
     its(:stdout) { should match(/;; flags: qr rd ra; QUERY: 1, ANSWER: [1-9]+, AUTHORITY: \d+, ADDITIONAL: \d+/) }
     its(:stdout) { should match(/;; ANSWER SECTION:\n#{ Regexp.escape('example.com.') }\s+\d+\s+IN\s+A\s+\d.*/) }
-    its(:stderr) { should match(/^$/) }
+    its(:stderr) { should eq "" }
   end
 end
