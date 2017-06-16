@@ -10,19 +10,21 @@ directory = ""
 keys = %w(unbound_server.key unbound_server.pem unbound_control.key unbound_control.pem)
 script_dir = "/usr/bin"
 default_user = "root"
-default_group = "wheel"
+default_group = "root"
 
 case os[:family]
 when "freebsd"
   conf_dir = "/usr/local/etc/unbound"
   directory = "/usr/local/etc/unbound"
   script_dir = "/usr/local/bin"
+  default_group = "wheel"
 when "openbsd"
   user = "_unbound"
   group = "_unbound"
   conf_dir = "/var/unbound/etc"
   directory = "/var/unbound"
   script_dir = "/usr/local/bin"
+  default_group = "wheel"
 when "ubuntu"
   directory = "/etc/unbound"
 when "redhat"
@@ -122,12 +124,14 @@ keys.each do |key|
   end
 end
 
-describe file(script_dir) do
-  it { should exist }
-  it { should be_directory }
-  it { should be_owned_by default_user }
-  it { should be_grouped_into default_group }
-  it { should be_mode 755 }
+unless script_dir =~ %r{\/usr\/(?:local\/)?s?bin$}
+  describe file(script_dir) do
+    it { should exist }
+    it { should be_directory }
+    it { should be_owned_by default_user }
+    it { should be_grouped_into default_group }
+    it { should be_mode 755 }
+  end
 end
 
 describe file("#{script_dir}/ansible-unbound-checkconf") do
