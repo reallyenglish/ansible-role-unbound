@@ -37,14 +37,7 @@ None
 | unbound\_freebsd\_chroot\_devfs\_ruleset\_number | `devfs(8)` rule set number. Change when unbound\_config\_chroot is not empty and you have other `devfs(8)` rule set with the same number. | 100 |
 | unbound\_script\_dir | directory to keep support script. this must be included in PATH environment variable. | {{ \_\_unbound\_script\_dir }} |
 | unbound\_config\_interface | `interface` to listen on | [] |
-| unbound\_config\_outgoing\_interface | `outgoing-interface` | "" |
-| unbound\_config\_do\_not\_query\_localhost | `do-not-query-localhost` | yes |
-| unbound\_config\_do\_ip4 | `do-ip4` | yes |
-| unbound\_config\_do\_ip6 | `do-ip6` | no |
 | unbound\_config\_access\_control | `access-control` | [] |
-| unbound\_config\_hide\_identity | `hide-identity` | yes |
-| unbound\_config\_hide\_version | `hide-version` | yes |
-| unbound\_config\_use\_syslog | `use-syslog` | yes |
 | unbound\_config\_private\_address | `private-address` | ["10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16", "192.254.0.0/16", "fd00::/8", "fe80::/10"] |
 | unbound\_config\_private\_domain | `private-domain` | [] |
 | unbound\_config\_remote\_control\_control\_enable | `control-enable` | yes |

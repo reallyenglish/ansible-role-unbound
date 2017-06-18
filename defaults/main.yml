@@ -11,14 +11,7 @@ unbound_config_chroot: ""
 unbound_freebsd_chroot_devfs_ruleset_number: 100
 
 unbound_config_interface: []
-unbound_config_outgoing_interface: ""
-unbound_config_do_not_query_localhost: "yes"
-unbound_config_do_ip4: "yes"
-unbound_config_do_ip6: "no"
 unbound_config_access_control: []
-unbound_config_hide_identity: "yes"
-unbound_config_hide_version: "yes"
-unbound_config_use_syslog: "yes"
 unbound_config_private_address:
   - 10.0.0.0/8
   - 172.16.0.0/12
@@ -27,6 +20,8 @@ unbound_config_private_address:
   - fd00::/8
   - fe80::/10
 unbound_config_private_domain: []
+unbound_config_server_extra: []
+
 unbound_config_remote_control_control_enable: "yes"
 unbound_config_remote_control_control_use_cert: "no"
 unbound_config_remote_control_control_interface: ""
@@ -35,6 +30,7 @@ unbound_config_server_key_file:   "{{ unbound_conf_dir }}/unbound_server.key"
 unbound_config_server_cert_file:  "{{ unbound_conf_dir }}/unbound_server.pem"
 unbound_config_control_key_file:  "{{ unbound_conf_dir }}/unbound_control.key"
 unbound_config_control_cert_file: "{{ unbound_conf_dir }}/unbound_control.pem"
+unbound_config_remote_control_extra: []
 
 unbound_forward_zone: []
 unbound_stub_zone: []
