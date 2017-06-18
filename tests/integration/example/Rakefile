@@ -3,6 +3,8 @@ require "pathname"
 require "net/http"
 require "tempfile"
 
+ENV["TERM"] = "xterm" # XXX TERM must be defined or pkg_add fails
+
 test_dir = Pathname.new(__FILE__).dirname
 role_dir = Pathname.new(test_dir).parent.parent.parent
 role_name = Pathname.new(role_dir).basename
