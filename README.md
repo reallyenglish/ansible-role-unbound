@@ -131,10 +131,10 @@ An example:
 
 ```yaml
 unbound_stub_zone:
-  name: example.net
-  stub-addr:
-    - 8.8.8.8
-    - 8.8.4.4
+  - name: example.net
+    stub-addr:
+      - 8.8.8.8
+      - 8.8.4.4
 ```
 
 ## Debian
