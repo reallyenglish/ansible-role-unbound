@@ -26,6 +26,7 @@ unbound_config_private_address:
   - 192.254.0.0/16
   - fd00::/8
   - fe80::/10
+unbound_config_local_zone: []
 unbound_config_private_domain: []
 unbound_config_remote_control_control_enable: "yes"
 unbound_config_remote_control_control_use_cert: "no"
