@@ -22,7 +22,7 @@ None
 | `unbound_group` | group of `unbound` | `{{ __unbound_group }}` |
 | `unbound_service` | service name of `unbound` | `unbound` |
 | `unbound_conf_dir` | path to config directory | `{{ __unbound_conf_dir }}` |
-| `unbound_conf_file` | path to `unbound.conf(5)` | `{{ __unbound_conf_dir }}/unbound.conf` |
+| `unbound_conf_file` | path to `unbound.conf(5)` | `{{ unbound_conf_dir }}/unbound.conf` |
 | `unbound_flags` | (not implemented yet) | `""` |
 | `unbound_script_dir` | directory to install scripts in `files` | `{{ __unbound_script_dir }}` |
 | `unbound_directory` | work directory of `unbound` | `{{ __unbound_directory }}` |

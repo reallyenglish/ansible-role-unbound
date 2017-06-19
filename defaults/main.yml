@@ -2,7 +2,7 @@ unbound_user: "{{ __unbound_user }}"
 unbound_group: "{{ __unbound_group }}"
 unbound_service: unbound
 unbound_conf_dir: "{{ __unbound_conf_dir }}"
-unbound_conf_file: "{{ __unbound_conf_dir }}/unbound.conf"
+unbound_conf_file: "{{ unbound_conf_dir }}/unbound.conf"
 unbound_flags: ""
 unbound_script_dir: "{{ __unbound_script_dir }}"
 
