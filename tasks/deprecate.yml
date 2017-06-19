@@ -3,34 +3,54 @@
 - assert:
     that:
       - not unbound_config_outgoing_interface is defined
-    msg: unbound_config_outgoing_interface is deprecated, use unbound_config_server_extra instead.
+    msg: unbound_config_outgoing_interface is deprecated, use unbound_config_server instead.
 
 - assert:
     that:
       - not unbound_config_use_syslog is defined
-    msg: unbound_config_use_syslog is deprecated, use unbound_config_server_extra instead.
+    msg: unbound_config_use_syslog is deprecated, use unbound_config_server instead.
 
 - assert:
     that:
       - not unbound_config_do_ip4 is defined
-    msg: unbound_config_do_ip4 is deprecated, use unbound_config_server_extra instead.
+    msg: unbound_config_do_ip4 is deprecated, use unbound_config_server instead.
 
 - assert:
     that:
       - not unbound_config_do_ip6 is defined
-    msg: unbound_config_do_ip6 is deprecated, use unbound_config_server_extra instead.
+    msg: unbound_config_do_ip6 is deprecated, use unbound_config_server instead.
 
 - assert:
     that:
       - not unbound_config_hide_identity is defined
-    msg: unbound_config_hide_identity is deprecated, use unbound_config_server_extra instead.
+    msg: unbound_config_hide_identity is deprecated, use unbound_config_server instead.
 
 - assert:
     that:
       - not unbound_config_hide_version is defined
-    msg: unbound_config_hide_version is deprecated, use unbound_config_server_extra instead.
+    msg: unbound_config_hide_version is deprecated, use unbound_config_server instead.
 
 - assert:
     that:
       - not unbound_config_do_not_query_localhost is defined
-    msg: unbound_config_do_not_query_localhost is deprecated, use unbound_config_server_extra instead.
+    msg: unbound_config_do_not_query_localhost is deprecated, use unbound_config_server instead.
+
+- assert:
+    that:
+      - not unbound_config_access_control is defined
+    msg: unbound_config_access_control is deprecated, use unbound_config_server instead.
+
+- assert:
+    that:
+      - not unbound_config_interface is defined
+    msg: unbound_config_interface is deprecated, use unbound_config_server instead.
+
+- assert:
+    that:
+      - not unbound_config_private_domain is defined
+    msg: unbound_config_private_domain is deprecated, use unbound_config_server instead.
+
+- assert:
+    that:
+      - not unbound_config_private_address is defined
+    msg: unbound_config_private_address is deprecated, use unbound_config_server instead.

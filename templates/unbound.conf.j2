@@ -1,20 +1,18 @@
 server:
   directory: "{{ unbound_directory }}"
   chroot: "{{ unbound_config_chroot }}"
-{% for i in unbound_config_interface %}
-  interface: {{ i }}
+{% for l in unbound_config_server %}
+{% if l | isdict %}
+{% if 'value' in l %}
+  {{ l['name'] }}: {{ l['value'] }}
+{% elif 'values' in l %}
+{% for value in l['values'] %}
+  {{ l['name'] }}: {{ value }}
 {% endfor %}
-{% for acl in unbound_config_access_control %}
-  access-control: {{ acl }}
-{% endfor %}
-{% for addr in unbound_config_private_address %}
-  private-address: {{ addr }}
-{% endfor %}
-{% for domain in unbound_config_private_domain %}
-  private-domain: "{{ domain }}"
-{% endfor %}
-{% for l in unbound_config_server_extra %}
+{% endif %}
+{% else %}
   {{ l }}
+{% endif %}
 {% endfor %}
 
 remote-control:
@@ -40,21 +38,45 @@ remote-control:
   control-cert-file: {{ unbound_config_control_cert_file }}
 {% endif %}
 {% for l in unbound_config_remote_control_extra %}
+{% if l | isdict %}
+{% for value in l['values'] %}
+  {{ l['name'] }}: {{ value }}
+{% endfor %}
+{% else %}
   {{ l }}
+{% endif %}
 {% endfor %}
 
 {% for zone in unbound_forward_zone %}
 forward-zone:
-  name: "{{ zone.name }}"
-{% for addr in zone.forward_addr %}
-  forward-addr: {{ addr }}
+{# place `name` at the top for readability #}
+  name: "{{ zone['name'] }}"
+{% for k, v in zone | dictsort() %}
+{% if k != 'name' %}
+{% if v | islist %}
+{% for value in v %}
+  {{ k }}: "{{ value }}"
+{% endfor %}
+{% else %}
+  {{ k }}: "{{ v }}"
+{% endif %}
+{% endif %}
 {% endfor %}
 {% endfor %}
 
 {% for zone in unbound_stub_zone %}
 stub-zone:
-  name: "{{ zone.name }}"
-{% for addr in zone.stub_addr %}
-  stub-addr: {{ addr }}
+{# place `name` at the top for readability #}
+  name: "{{ zone['name'] }}"
+{% for k, v in zone | dictsort() %}
+{% if k != 'name' %}
+{% if v | islist %}
+{% for value in v %}
+  {{ k }}: "{{ value }}"
+{% endfor %}
+{% else %}
+  {{ k }}: "{{ v }}"
+{% endif %}
+{% endif %}
 {% endfor %}
 {% endfor %}

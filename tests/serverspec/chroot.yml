@@ -3,12 +3,13 @@
     - ansible-role-unbound
   vars:
     unbound_config_chroot: "{% if ansible_os_family == 'OpenBSD' %}/var/unbound{% elif ansible_os_family == 'FreeBSD' %}/usr/local/etc/unbound{% endif %}"
-    unbound_config_access_control:
-      - 0.0.0.0/0 refuse
-      - 127.0.0.0/8 allow
-      - 10.100.1.0/24 allow
-    unbound_config_server_extra:
+    unbound_config_server:
       - "outgoing-interface: {{ ansible_default_ipv4.address }}"
       - "do-not-query-localhost: yes"
+      - name: access-control
+        values:
+          - 0.0.0.0/0 refuse
+          - 127.0.0.0/8 allow
+          - 10.100.1.0/24 allow
     # unbound in ubuntu 14.04 does not support unix socket
     unbound_config_remote_control_control_interface: "{% if (ansible_distribution == 'Ubuntu' and ansible_distribution_version | version_compare('14.04', '<=')) or (ansible_distribution == 'CentOS' and ansible_distribution_version | version_compare('7.3.1611', '<=')) %}127.0.0.1{% else %}/var/run/unbound.sock{% endif %}"
