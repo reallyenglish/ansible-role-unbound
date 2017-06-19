@@ -124,7 +124,7 @@ keys.each do |key|
   end
 end
 
-unless script_dir =~ %r{\/usr\/(?:local\/)?s?bin$}
+unless script_dir =~ %r{/usr/(?:local/)?s?bin$}
   describe file(script_dir) do
     it { should exist }
     it { should be_directory }
