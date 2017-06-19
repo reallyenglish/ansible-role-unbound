@@ -54,9 +54,10 @@ An example:
 unbound_config_server:
   - "hide-identity: yes"
 ```
+
 Which generates:
 
-```yaml`
+```yaml
 server:
   hide-identity: yes
 ```
