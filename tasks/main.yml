@@ -9,6 +9,7 @@
   shell: "unbound -h | grep -E '^Version[[:space:]]+[[:digit:].]+$' | cut -f 2 -d' '"
   register: register_unbound_version
   changed_when: false
+  check_mode: no
 
 - set_fact:
     # unbound_version is available for use from this point. note that this
