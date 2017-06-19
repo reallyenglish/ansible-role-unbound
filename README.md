@@ -19,7 +19,7 @@ None
 | Variable | Description | Default |
 |----------|-------------|---------|
 | `unbound_user` | user of `unbound` | `{{ __unbound_user }}` |
-| `unbound_group` | group of `unboun` | `{{ __unbound_group }}` |
+| `unbound_group` | group of `unbound` | `{{ __unbound_group }}` |
 | `unbound_service` | service name of `unbound` | `unbound` |
 | `unbound_conf_dir` | path to config directory | `{{ __unbound_conf_dir }}` |
 | `unbound_conf_file` | path to `unbound.conf(5)` | `{{ __unbound_conf_dir }}/unbound.conf` |
