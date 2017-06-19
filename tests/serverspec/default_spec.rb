@@ -91,12 +91,21 @@ describe file(config) do
   end
 
   # forward-zone
+<<<<<<< HEAD
   its(:content) { should match(/^forward-zone:\n\s+name: "example\.com"\n\s+forward-addr: "8\.8\.8\.8"\n\s+forward-addr:\s+"8\.8\.4\.4"\n/) }
   its(:content) { should match(/^forward-zone:\n\s+name: "example\.org"\n\s+forward-addr: "8\.8\.8\.8"\n/) }
 
   # stub-zone
   its(:content) { should match(/^stub-zone:\n\s+name: "example\.net"\n\s+stub-addr: "8\.8\.8\.8"\n\s+stub-addr:\s+"8\.8\.4\.4"\n/) }
   its(:content) { should match(/^stub-zone:\n\s+name: "foo\.example"\n\s+stub-addr: "8\.8\.8\.8"\n/) }
+=======
+  its(:content) { should match(/^forward-zone:\n\s+name: "example\.com"\n\s+forward-addr: 8\.8\.8\.8/) }
+  its(:content) { should match(/^forward-zone:\n\s+name: "example\.org"\n\s+forward-addr: 8\.8\.8\.8/) }
+
+  # stub-zone
+  its(:content) { should match(/^stub-zone:\n\s+name: "example\.net"\n\s+stub-addr: 8\.8\.8\.8/) }
+  its(:content) { should match(/^stub-zone:\n\s+name: "foo\.example"\n\s+stub-addr: 8\.8\.8\.8/) }
+>>>>>>> master
 end
 
 describe service(service) do
