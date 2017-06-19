@@ -60,6 +60,7 @@ describe file(config) do
   its(:content_as_yaml) { should include("server" => include("hide-identity" => true)) }
   its(:content_as_yaml) { should include("server" => include("hide-version" => true)) }
   its(:content_as_yaml) { should include("server" => include("use-syslog" => true)) }
+  its(:content_as_yaml) { should_not include("server" => "chroot") }
   its(:content) { should match(/access-control: #{ Regexp.escape('0.0.0.0/0 refuse')    }/) }
   its(:content) { should match(/access-control: #{ Regexp.escape('127.0.0.0/8 allow')   }/) }
   its(:content) { should match(/access-control: #{ Regexp.escape('10.100.1.0/24 allow') }/) }
