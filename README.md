@@ -2,13 +2,6 @@
 
 Configures `unbound`.
 
-## Notes
-
-The role does not cover all configuration options available in
-`unbound.conf(5)`. The goal of the role is creating a role that reasonably
-works out-of-box with minimum efforts. If you need to configure every options
-supported in `unbound.conf(5)`, This is not for you.
-
 ## chroot support
 
 When `unbound_config_chroot` is not empty, the role creates necessary files for
@@ -45,7 +38,7 @@ None
 | `unbound_config_control_cert_file` | `control-cert-file` | `{{ unbound_conf_dir }}/unbound_control.pem` |
 | `unbound_config_remote_control_extra` | list of extra settings in `remote-control` | `[]` |
 | `unbound_forward_zone` | list of settings in `forward-zone` (see below) | `[]` |
-| `unbound_stub_zone` | TODO | `[]` |
+| `unbound_stub_zone` | list of settings in `stub-zone` (see below) | `[]` |
 
 ## `unbound_config_server`
 
@@ -105,7 +98,7 @@ unbound_config_server:
 Which generates:
 
 ```yaml
-unbound_config_server:
+server:
   access-control: 0.0.0.0/0 refuse
   access-control: 127.0.0.0/8 allow
 ```
