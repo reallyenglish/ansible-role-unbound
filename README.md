@@ -110,9 +110,9 @@ server:
 in `unbound.conf(5)`.
 
 An element is a dict of zone. The dict must have a mandatory key, `name`, whose
-value is the name of the zone . Other keys in the dict is a setting for the
+value is the name of the zone . Other key in the dict is a setting for the
 zone, such as `forward-addr`, whose value is the value of the setting. See
-"Forward Zone Options" in `unbound.conf(5)`. Values of optional settings can be
+"Forward Zone Options" in `unbound.conf(5)`. Value of optional settings can be
 a string or a list. An example:
 
 ```yaml
