@@ -3,12 +3,16 @@
 
 - include_vars: "{{ ansible_os_family }}.yml"
 
+- include: deprecate.yml
+
 - include: "install-{{ ansible_os_family }}.yml"
 
 - name: Register unbound version
   shell: "unbound -h | grep -E '^Version[[:space:]]+[[:digit:].]+$' | cut -f 2 -d' '"
   register: register_unbound_version
   changed_when: false
+  # TODO use `check_mode` instead. see #30
+  always_run: yes
 
 - set_fact:
     # unbound_version is available for use from this point. note that this

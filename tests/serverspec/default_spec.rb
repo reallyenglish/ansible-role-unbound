@@ -60,10 +60,13 @@ describe file(config) do
   its(:content_as_yaml) { should include("server" => include("hide-identity" => true)) }
   its(:content_as_yaml) { should include("server" => include("hide-version" => true)) }
   its(:content_as_yaml) { should include("server" => include("use-syslog" => true)) }
+  its(:content_as_yaml) { should_not include("server" => "chroot") }
   its(:content) { should match(/access-control: #{ Regexp.escape('0.0.0.0/0 refuse')    }/) }
   its(:content) { should match(/access-control: #{ Regexp.escape('127.0.0.0/8 allow')   }/) }
   its(:content) { should match(/access-control: #{ Regexp.escape('10.100.1.0/24 allow') }/) }
-  %w(10.0.0.0/8 172.16.0.0/12 192.168.0.0/16 192.254.0.0/16 fd00::/8 fe80::/10).each do |addr|
+  its(:content) { should match(/local-zone:\s+10\.in-addr\.arpa nodefault\n/) }
+  its(:content) { should match(/local-zone:\s+168\.192\.in-addr\.arpa nodefault\n/) }
+  %w(10.0.0.0/8 172.16.0.0/12 192.168.0.0/16 192.254.0.0/16 fc00::/7 fd00::/8 fe80::/10).each do |addr|
     its(:content) { should match(/private-address: #{ Regexp.escape(addr) }/) }
   end
   its(:content) { should match(/private-domain: "example\.com"/) }
@@ -88,12 +91,12 @@ describe file(config) do
   end
 
   # forward-zone
-  its(:content) { should match(/^forward-zone:\n\s+name: "example\.com"\n\s+forward-addr: 8\.8\.8\.8/) }
-  its(:content) { should match(/^forward-zone:\n\s+name: "example\.org"\n\s+forward-addr: 8\.8\.8\.8/) }
+  its(:content) { should match(/^forward-zone:\n\s+name: "example\.com"\n\s+forward-addr: "8\.8\.8\.8"\n\s+forward-addr:\s+"8\.8\.4\.4"\n/) }
+  its(:content) { should match(/^forward-zone:\n\s+name: "example\.org"\n\s+forward-addr: "8\.8\.8\.8"\n/) }
 
   # stub-zone
-  its(:content) { should match(/^stub-zone:\n\s+name: "example\.net"\n\s+stub-addr: 8\.8\.8\.8/) }
-  its(:content) { should match(/^stub-zone:\n\s+name: "foo\.example"\n\s+stub-addr: 8\.8\.8\.8/) }
+  its(:content) { should match(/^stub-zone:\n\s+name: "example\.net"\n\s+stub-addr: "8\.8\.8\.8"\n\s+stub-addr:\s+"8\.8\.4\.4"\n/) }
+  its(:content) { should match(/^stub-zone:\n\s+name: "foo\.example"\n\s+stub-addr: "8\.8\.8\.8"\n/) }
 end
 
 describe service(service) do

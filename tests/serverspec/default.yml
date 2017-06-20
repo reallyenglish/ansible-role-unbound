@@ -3,30 +3,61 @@
     - ansible-role-unbound
   vars:
     unbound_config_chroot: ""
-    unbound_config_interface:
-      - "{{ ansible_default_ipv4.address }}"
-    unbound_config_outgoing_interface: "{{ ansible_default_ipv4.address }}"
-    unbound_config_access_control:
-      - 0.0.0.0/0 refuse
-      - 127.0.0.0/8 allow
-      - 10.100.1.0/24 allow
-    unbound_config_private_domain:
-      - example.com
+    unbound_config_server:
+      - "outgoing-interface: {{ ansible_default_ipv4.address }}"
+      - "do-not-query-localhost: yes"
+      - "do-ip4: yes"
+      - "do-ip6: no"
+      - "hide-identity: yes"
+      - "hide-version: yes"
+      # you may use dict, too
+      - name: use-syslog
+        value: "yes"
+      # some settings are allowed to appear multiple times, which makes
+      # `unbound.conf(5)` different from YAML.
+      - name: local-zone
+        values:
+          - 10.in-addr.arpa nodefault
+          - 168.192.in-addr.arpa nodefault
+      - name: access-control
+        values:
+          - 0.0.0.0/0 refuse
+          - 127.0.0.0/8 allow
+          - 10.100.1.0/24 allow
+      - name: private-address
+        values:
+          - 10.0.0.0/8
+          - 172.16.0.0/12
+          - 192.168.0.0/16
+          - 192.254.0.0/16
+          - fc00::/7
+          - fd00::/8
+          - fe80::/10
+      - name: private-domain
+        values:
+          - '"example.com"'
+      # if `values` has a single value, you may use `values`, which is not
+      # recommended. prefer `value` to `values` in this case.
+      - name: interface
+        values:
+          - "{{ ansible_default_ipv4.address }}"
     # unbound in ubuntu 14.04 does not support unix socket
     unbound_config_remote_control_control_interface: "{% if (ansible_distribution == 'Ubuntu' and ansible_distribution_version | version_compare('14.04', '<=')) or (ansible_distribution == 'CentOS' and ansible_distribution_version | version_compare('7.3.1611', '<=')) %}127.0.0.1{% else %}/var/run/unbound.sock{% endif %}"
     unbound_forward_zone:
       -
         name: example.com
-        forward_addr:
+        forward-addr:
           - 8.8.8.8
+          - 8.8.4.4
       -
         name: example.org
-        forward_addr:
+        forward-addr:
           - 8.8.8.8
     unbound_stub_zone:
       - name: example.net
-        stub_addr:
+        stub-addr:
           - 8.8.8.8
+          - 8.8.4.4
       - name: foo.example
-        stub_addr:
+        stub-addr:
           - 8.8.8.8

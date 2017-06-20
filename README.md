@@ -2,13 +2,6 @@
 
 Configures `unbound`.
 
-## Notes
-
-The role does not cover all configuration options available in
-`unbound.conf(5)`. The goal of the role is creating a role that reasonably
-works out-of-box with minimum efforts. If you need to configure every options
-supported in `unbound.conf(5)`, This is not for you.
-
 ## chroot support
 
 When `unbound_config_chroot` is not empty, the role creates necessary files for
@@ -25,78 +18,164 @@ None
 
 | Variable | Description | Default |
 |----------|-------------|---------|
-| unbound\_user | user of unbound | {{ \_\_unbound\_user }} |
-| unbound\_group | group of unbound | {{ \_\_unbound\_group }} |
-| unbound\_service | service name | unbound |
-| unbound\_conf\_dir | path to dir of config directory | {{ \_\_unbound\_conf\_dir }} |
-| unbound\_conf\_file | path to `unbound.conf(5)` | {{ \_\_unbound\_conf\_dir }}/unbound.conf |
-| unbound\_flags | unused | "" |
-| unbound\_script\_dir | directory to install scripts in `files` | {{ \_\_unbound\_script\_dir }} |
-| unbound\_directory | work directory | {{ \_\_unbound\_directory }} |
-| unbound\_config\_chroot | path to chroot directory | "" |
-| unbound\_freebsd\_chroot\_devfs\_ruleset\_number | `devfs(8)` rule set number. Change when unbound\_config\_chroot is not empty and you have other `devfs(8)` rule set with the same number. | 100 |
-| unbound\_script\_dir | directory to keep support script. this must be included in PATH environment variable. | {{ \_\_unbound\_script\_dir }} |
-| unbound\_config\_interface | `interface` to listen on | [] |
-| unbound\_config\_outgoing\_interface | `outgoing-interface` | "" |
-| unbound\_config\_do\_not\_query\_localhost | `do-not-query-localhost` | yes |
-| unbound\_config\_do\_ip4 | `do-ip4` | yes |
-| unbound\_config\_do\_ip6 | `do-ip6` | no |
-| unbound\_config\_access\_control | `access-control` | [] |
-| unbound\_config\_hide\_identity | `hide-identity` | yes |
-| unbound\_config\_hide\_version | `hide-version` | yes |
-| unbound\_config\_use\_syslog | `use-syslog` | yes |
-| unbound\_config\_private\_address | `private-address` | ["10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16", "192.254.0.0/16", "fd00::/8", "fe80::/10"] |
-| unbound\_config\_private\_domain | `private-domain` | [] |
-| unbound\_config\_remote\_control\_control\_enable | `control-enable` | yes |
-| unbound\_config\_remote\_control\_control\_use\_cert | `control-use-cert` | no |
-| unbound\_config\_remote\_control\_control\_interface | `control-interface` | "" |
-| unbound\_config\_server\_key\_file | `server-key-file` | {{ unbound\_config\_directory }}/unbound\_server.key |
-| unbound\_config\_server\_cert\_file | `server-cert-file` | {{ unbound\_config\_directory }}/unbound\_server.pem |
-| unbound\_config\_control\_key\_file | `control-key-file` | {{ unbound\_config\_directory }}/unbound\_control.key |
-| unbound\_config\_control\_cert\_file | `control-cert-file` | {{ unbound\_config\_directory }}/unbound\_control.pem |
-| unbound\_forward\_zone | `forward-zone` | [] |
+| `unbound_user` | user of `unbound` | `{{ __unbound_user }}` |
+| `unbound_group` | group of `unbound` | `{{ __unbound_group }}` |
+| `unbound_service` | service name of `unbound` | `unbound` |
+| `unbound_conf_dir` | path to config directory | `{{ __unbound_conf_dir }}` |
+| `unbound_conf_file` | path to `unbound.conf(5)` | `{{ unbound_conf_dir }}/unbound.conf` |
+| `unbound_flags` | (not implemented yet) | `""` |
+| `unbound_script_dir` | directory to install scripts in `files` | `{{ __unbound_script_dir }}` |
+| `unbound_directory` | work directory of `unbound` | `{{ __unbound_directory }}` |
+| `unbound_config_chroot` | path to `chroo(2)` directory | `""` |
+| `unbound_freebsd_chroot_devfs_ruleset_number` | `devfs(8)` rule set number. Change when `unbound_config_chroot` is not empty and you have other `devfs(8)` rule set with the same number. | `100` |
+| `unbound_config_server` | list of settings in `server` section (see below) | `[]` |
+| `unbound_config_remote_control_control_enable` | `control-enable` | `yes` |
+| `unbound_config_remote_control_control_use_cert` | `control-use-cert` | `no` |
+| `unbound_config_remote_control_control_interface` | `control-interface` | `""` |
+| `unbound_config_server_key_file` | `server-key-file` | `{{ unbound_conf_dir }}/unbound_server.key` |
+| `unbound_config_server_cert_file` | `server-cert-file` | `{{ unbound_conf_dir }}/unbound_server.pem` |
+| `unbound_config_control_key_file` | `control-key-file` | `{{ unbound_conf_dir }}/unbound_control.key` |
+| `unbound_config_control_cert_file` | `control-cert-file` | `{{ unbound_conf_dir }}/unbound_control.pem` |
+| `unbound_config_remote_control_extra` | list of extra settings in `remote-control` | `[]` |
+| `unbound_forward_zone` | list of settings in `forward-zone` (see below) | `[]` |
+| `unbound_stub_zone` | list of settings in `stub-zone` (see below) | `[]` |
+
+## `unbound_config_server`
+
+`unbound_config_server` is a list of settings in `unbound.conf(5)`. Elements
+can be string, or dict. Note that `directory` and `chroot` are hard-coded, and
+cannot be set in `unbound_config_server`. Use the provided role variables for
+them.
+
+When an element is a string, the string is simply added to `unbound.conf(5)`.
+An example:
+
+```yaml
+unbound_config_server:
+  - "hide-identity: yes"
+```
+
+Which generates:
+
+```yaml
+server:
+  hide-identity: yes
+```
+
+When an element is a dict, the dict must have a mandatory key `name`. The dict
+also must have either `value`, or `values` as a key.
+
+| Key | Value | Description |
+|-----|-------|-------------|
+| `name` | name of setting | one of keywords listed in "Server Options" in `unbound.conf(5)` |
+| `value` | single value of the `name` setting | see `unbound.conf(5)` |
+| `values` | list of values of the `name` setting | use this if the `name` setting is allowed to be appear multiple times in `unbound.conf(5)` |
+
+Here is a single-value example:
+
+```yaml
+unbound_config_server:
+  name: use-syslog
+  value: "yes"
+```
+
+Which generates:
+
+```yaml
+server:
+  use-syslog: yes
+```
+
+Here is a multiple-values example:
+
+```yaml
+unbound_config_server:
+  name: access-control
+  values:
+    - 0.0.0.0/0 refuse
+    - 127.0.0.0/8 allow
+```
+
+Which generates:
+
+```yaml
+server:
+  access-control: 0.0.0.0/0 refuse
+  access-control: 127.0.0.0/8 allow
+```
+
+## `unbound_forward_zone`
+
+`unbound_forward_zone` is a list of zones described in "Forward Zone Options"
+in `unbound.conf(5)`.
+
+An element is a dict of zone. The dict must have a mandatory key, `name`, whose
+value is the name of the zone . Other key in the dict is a setting for the
+zone, such as `forward-addr`, whose value is the value of the setting. See
+"Forward Zone Options" in `unbound.conf(5)`. Value of optional settings can be
+a string or a list. An example:
+
+```yaml
+unbound_forward_zone:
+  - name: example.com
+    forward-addr:
+      - 8.8.8.8
+      - 8.8.4.4
+```
+## `unbound_stub_zone`
+
+`unbound_stub_zone` is same variable as `unbound_forward_zone`, but for stub
+zone. See "Stub Zone Options" in `unbound.conf(5)`.
+
+An example:
+
+```yaml
+unbound_stub_zone:
+  - name: example.net
+    stub-addr:
+      - 8.8.8.8
+      - 8.8.4.4
+```
 
 ## Debian
 
 | Variable | Default |
 |----------|---------|
-| \_\_unbound\_user | unbound |
-| \_\_unbound\_group | unbound |
-| \_\_unbound\_conf\_dir | /etc/unbound |
-| \_\_unbound\_script\_dir | /usr/bin |
-| \_\_unbound\_directory | /etc/unbound |
+| `__unbound_user` | `unbound` |
+| `__unbound_group` | `unbound` |
+| `__unbound_conf_dir` | `/etc/unbound` |
+| `__unbound_script_dir` | `/usr/bin` |
+| `__unbound_directory` | `/etc/unbound` |
 
 ## FreeBSD
 
 | Variable | Default |
 |----------|---------|
-| \_\_unbound\_user | unbound |
-| \_\_unbound\_group | unbound |
-| \_\_unbound\_conf\_dir | /usr/local/etc/unbound |
-| \_\_unbound\_script\_dir | /usr/local/bin |
-| \_\_unbound\_directory | /usr/local/etc/unbound |
+| `__unbound_user` | `unbound` |
+| `__unbound_group` | `unbound` |
+| `__unbound_conf_dir` | `/usr/local/etc/unbound` |
+| `__unbound_script_dir` | `/usr/local/bin` |
+| `__unbound_directory` | `/usr/local/etc/unbound` |
 
 ## OpenBSD
 
 | Variable | Default |
 |----------|---------|
-| \_\_unbound\_user | \_unbound |
-| \_\_unbound\_group | \_unbound |
-| \_\_unbound\_conf\_dir | /var/unbound/etc |
-| \_\_unbound\_script\_dir | /usr/local/bin |
-| \_\_unbound\_directory | /var/unbound |
+| `__unbound_user` | `_unbound` |
+| `__unbound_group` | `_unbound` |
+| `__unbound_conf_dir` | `/var/unbound/etc` |
+| `__unbound_script_dir` | `/usr/local/bin` |
+| `__unbound_directory` | `/var/unbound` |
 
 ## RedHat
 
 | Variable | Default |
 |----------|---------|
-| \_\_unbound\_user | unbound |
-| \_\_unbound\_group | unbound |
-| \_\_unbound\_conf\_dir | /etc/unbound |
-| \_\_unbound\_script\_dir | /usr/bin |
-| \_\_unbound\_directory | /etc/unbound |
-
-Created by [yaml2readme.rb](https://gist.github.com/trombik/b2df709657c08d845b1d3b3916e592d3)
+| `__unbound_user` | `unbound` |
+| `__unbound_group` | `unbound` |
+| `__unbound_conf_dir` | `/etc/unbound` |
+| `__unbound_script_dir` | `/usr/bin` |
+| `__unbound_directory` | `/etc/unbound` |
 
 # Dependencies
 
@@ -110,32 +189,61 @@ None
     - ansible-role-unbound
   vars:
     unbound_config_chroot: ""
-    unbound_config_interface:
-      - "{{ ansible_default_ipv4.address }}"
-    unbound_config_outgoing_interface: "{{ ansible_default_ipv4.address }}"
-    unbound_config_access_control:
-      - 0.0.0.0/0 refuse
-      - 127.0.0.0/8 allow
-      - 10.100.1.0/24 allow
-    unbound_config_private_domain:
-      - example.com
+    unbound_config_server:
+      - "outgoing-interface: {{ ansible_default_ipv4.address }}"
+      - "do-not-query-localhost: yes"
+      - "do-ip4: yes"
+      - "do-ip6: no"
+      - "hide-identity: yes"
+      - "hide-version: yes"
+      # you may use dict, too
+      - name: use-syslog
+        value: "yes"
+      - name: interface
+        # some settings are allowed to appear multiple times, which makes
+        # `unbound.conf(5)` different from YAML. use `values`, not `value`
+        values:
+          - "{{ ansible_default_ipv4.address }}"
+      - name: local-zone
+        values:
+          - 10.in-addr.arpa nodefault
+          - 168.192.in-addr.arpa nodefault
+      - name: access-control
+        values:
+          - 0.0.0.0/0 refuse
+          - 127.0.0.0/8 allow
+          - 10.100.1.0/24 allow
+      - name: private-address
+        values:
+          - 10.0.0.0/8
+          - 172.16.0.0/12
+          - 192.168.0.0/16
+          - 192.254.0.0/16
+          - fc00::/7
+          - fd00::/8
+          - fe80::/10
+      - name: private-domain
+        values:
+          - '"example.com"'
     # unbound in ubuntu 14.04 does not support unix socket
     unbound_config_remote_control_control_interface: "{% if (ansible_distribution == 'Ubuntu' and ansible_distribution_version | version_compare('14.04', '<=')) or (ansible_distribution == 'CentOS' and ansible_distribution_version | version_compare('7.3.1611', '<=')) %}127.0.0.1{% else %}/var/run/unbound.sock{% endif %}"
     unbound_forward_zone:
       -
         name: example.com
-        forward_addr:
+        forward-addr:
           - 8.8.8.8
+          - 8.8.4.4
       -
         name: example.org
-        forward_addr:
+        forward-addr:
           - 8.8.8.8
     unbound_stub_zone:
       - name: example.net
-        stub_addr:
+        stub-addr:
           - 8.8.8.8
+          - 8.8.4.4
       - name: foo.example
-        stub_addr:
+        stub-addr:
           - 8.8.8.8
 ```
 

@@ -1,38 +1,19 @@
 server:
   directory: "{{ unbound_directory }}"
   chroot: "{{ unbound_config_chroot }}"
-{% for i in unbound_config_interface %}
-  interface: {{ i }}
+{% for l in unbound_config_server %}
+{% if l | isdict %}
+{% if 'value' in l %}
+  {{ l['name'] }}: {{ l['value'] }}
+{% elif 'values' in l %}
+{% for value in l['values'] %}
+  {{ l['name'] }}: {{ value }}
 {% endfor %}
-{% if unbound_config_outgoing_interface %}
-  outgoing-interface: {{ unbound_config_outgoing_interface }}
 {% endif %}
-{% if unbound_config_do_not_query_localhost %}
-  do-not-query-localhost: {{ unbound_config_do_not_query_localhost }}
+{% else %}
+  {{ l }}
 {% endif %}
-
-  do-ip4: {{ unbound_config_do_ip4 }}
-  do-ip6: {{ unbound_config_do_ip6 }}
-
-{% for acl in unbound_config_access_control %}
-  access-control: {{ acl }}
 {% endfor %}
-
-  hide-identity: {{ unbound_config_hide_identity }}
-  hide-version: {{ unbound_config_hide_version }}
-  use-syslog: {{ unbound_config_use_syslog }}
-
-{% for addr in unbound_config_private_address %}
-  private-address: {{ addr }}
-{% endfor %}
-{% for domain in unbound_config_private_domain %}
-  private-domain: "{{ domain }}"
-{% endfor %}
-
-  # Uncomment to enable qname minimisation.
-  # https://tools.ietf.org/html/draft-ietf-dnsop-qname-minimisation-08
-  #
-  # qname-minimisation: yes
 
 remote-control:
   control-enable: {{ unbound_config_remote_control_control_enable }}
@@ -56,19 +37,46 @@ remote-control:
 {% if unbound_config_control_cert_file %}
   control-cert-file: {{ unbound_config_control_cert_file }}
 {% endif %}
+{% for l in unbound_config_remote_control_extra %}
+{% if l | isdict %}
+{% for value in l['values'] %}
+  {{ l['name'] }}: {{ value }}
+{% endfor %}
+{% else %}
+  {{ l }}
+{% endif %}
+{% endfor %}
 
 {% for zone in unbound_forward_zone %}
 forward-zone:
-  name: "{{ zone.name }}"
-{% for addr in zone.forward_addr %}
-  forward-addr: {{ addr }}
+{# place `name` at the top for readability #}
+  name: "{{ zone['name'] }}"
+{% for k, v in zone | dictsort() %}
+{% if k != 'name' %}
+{% if v | islist %}
+{% for value in v %}
+  {{ k }}: "{{ value }}"
+{% endfor %}
+{% else %}
+  {{ k }}: "{{ v }}"
+{% endif %}
+{% endif %}
 {% endfor %}
 {% endfor %}
 
 {% for zone in unbound_stub_zone %}
 stub-zone:
-  name: "{{ zone.name }}"
-{% for addr in zone.stub_addr %}
-  stub-addr: {{ addr }}
+{# place `name` at the top for readability #}
+  name: "{{ zone['name'] }}"
+{% for k, v in zone | dictsort() %}
+{% if k != 'name' %}
+{% if v | islist %}
+{% for value in v %}
+  {{ k }}: "{{ value }}"
+{% endfor %}
+{% else %}
+  {{ k }}: "{{ v }}"
+{% endif %}
+{% endif %}
 {% endfor %}
 {% endfor %}

@@ -1,0 +1,17 @@
+---
+
+- assert:
+    that: "not {{ item }} is defined"
+    msg: "{{ item }} is deprecated, use unbound_config_server instead."
+  with_items:
+    - unbound_config_outgoing_interface
+    - unbound_config_use_syslog
+    - unbound_config_do_ip4
+    - unbound_config_do_ip6
+    - unbound_config_hide_identity
+    - unbound_config_hide_version
+    - unbound_config_do_not_query_localhost
+    - unbound_config_access_control
+    - unbound_config_interface
+    - unbound_config_private_domain
+    - unbound_config_private_address
