@@ -54,7 +54,7 @@
     state: present
 
 - name: See if mfs is mounted
-  shell: mount | cut -d ' ' -f 3
+  shell: mount -t mfs | cut -d ' ' -f 3
   register: mount_mfs_mounted
   changed_when: false
   always_run: yes
