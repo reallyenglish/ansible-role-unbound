@@ -90,6 +90,15 @@ when "freebsd"
 
 when "openbsd"
 
+  describe file("/etc/fstab") do
+    its(:content) { should match(/^swap #{Regexp.escape("/var/unbound/dev")} mfs rw,nosuid,-s=256k 0 0/) }
+  end
+
+  describe command("mount") do
+    its(:exit_status) { should eq 0 }
+    its(:stdout) { should match(/^mfs:\d+ on #{Regexp.escape("/var/unbound/dev")} type mfs \(asynchronous, local, nosuid, size=512 512-blocks\)/) }
+  end
+
   describe file("#{chroot_dir}/dev") do
     it { should be_mounted }
   end
