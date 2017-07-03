@@ -2,7 +2,22 @@
   roles:
     - ansible-role-unbound
   vars:
-    unbound_config_chroot: "{% if ansible_os_family == 'OpenBSD' %}/var/unbound{% elif ansible_os_family == 'FreeBSD' %}/usr/local/etc/unbound{% endif %}"
+    chroot_dir: "{% if ansible_os_family == 'OpenBSD' %}/var/unbound{% elif ansible_os_family == 'FreeBSD' %}/usr/local/etc/unbound{% endif %}"
+
+    # all variables starting with "devfsrules" are defined here for FreeBSD
+    devfsrules:
+      - name: simple_chroot
+        number: 100
+        rules: |
+          add include $devfsrules_hide_all
+          add include $devfsrules_unhide_basic
+          add path random  unhide
+          add path urandom unhide
+    devfsrules_devfs_set_rulesets:
+      - path: "{{ chroot_dir }}/dev"
+        name: simple_chroot
+        state: present
+    unbound_config_chroot: "{{ chroot_dir }}"
     unbound_config_server:
       - "outgoing-interface: {{ ansible_default_ipv4.address }}"
       - "do-not-query-localhost: yes"

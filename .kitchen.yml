@@ -15,6 +15,7 @@ provisioner:
   ansible_extra_flags: <%= ENV['ANSIBLE_EXTRA_FLAGS'] %>
   http_proxy: <%= ENV['ANSIBLE_PROXY'] %>
   idempotency_test: true
+  requirements_path: requirements.yml
   additional_copy_path:
     - extra_modules
     - filter_plugins
