@@ -13,65 +13,6 @@
     path: "{{ unbound_chroot_dev_dir }}"
     state: directory
 
-- name: Test if mfs is mounted
-  command: mount -t mfs
-  register: register_mount
-  changed_when: false
-    
-- name: Mount mfs unbound_chroot_dev_dir
-
-  # By default, most of disk devices are mounted with 'nodev' in OpenBSD. To
-  # create device files in chroot directory, create a small mfs disk.
-  command: "mount_mfs -s 256k -o nosuid swap {{ unbound_chroot_dev_dir }}"
-  when: "unbound_chroot_dev_dir not in register_mount.stdout"
-
-- name: Create /dev/random
-
-  # major and minor number can be found by:
-  #
-  # ls -al /dev/random                                                                                                   
-  # crw-r--r--  1 root  wheel   45,   0 Nov  2 23:57 /dev/random
-  command: mknod -m 644 random c 45 0
-  args:
-    chdir: "{{ unbound_chroot_dev_dir }}"
-    creates: "{{ unbound_chroot_dev_dir }}/random"
-
-- name: Create /dev/null
-
-  # Probably not all device files are required by unbound. However, in the
-  # future, these tasks should be rolled up in a role so that other role can
-  # create chroot. Others might need these.
-  #
-  # XXX better to run MAKEDEV?
-  command: mknod -m 666 null c 2 2
-  args:
-    chdir: "{{ unbound_chroot_dev_dir }}"
-    creates: "{{ unbound_chroot_dev_dir }}/null"
-
-- name: Create /dev/zero
-  command: mknod -m 666 zero c 2 12
-  args:
-    chdir: "{{ unbound_chroot_dev_dir }}"
-    creates: "{{ unbound_chroot_dev_dir }}/zero"
-
-- name: Create /dev/stdin
-  command: mknod -m 666 stdin c 22 0
-  args:
-    chdir: "{{ unbound_chroot_dev_dir }}"
-    creates: "{{ unbound_chroot_dev_dir }}/stdin"
-
-- name: Create /dev/stdout
-  command: mknod -m 666 stdout c 22 1
-  args:
-    chdir: "{{ unbound_chroot_dev_dir }}"
-    creates: "{{ unbound_chroot_dev_dir }}/stdout"
-
-- name: Create /dev/stderr
-  command: mknod -m 666 stderr c 22 2
-  args:
-    chdir: "{{ unbound_chroot_dev_dir }}"
-    creates: "{{ unbound_chroot_dev_dir }}/stderr"
-
 - name: Copy mk_chroot.sh
 
   # mfs cannot survive reboots. Add a script to re-create chroot environment
@@ -99,3 +40,34 @@
   lineinfile:
     dest: /etc/rc.local
     line: "[ -x /usr/local/bin/mk_chroot ] && /usr/local/bin/mk_chroot {{ unbound_config_chroot }}"
+
+- name: Add mfs to fstab(5)
+  mount:
+    # By default, most of disk devices are mounted with 'nodev' in OpenBSD. To
+    # create device files in chroot directory, create a small mfs disk.
+    name: "{{ unbound_chroot_dev_dir }}"
+    src: swap
+    opts: "rw,nosuid,-s=256k"
+    fstype: mfs
+    # XXX `state: mounted` cannot be used here because a bug in ansible, which causes:
+    # "Error mounting /var/unbound/dev: mount_mfs: -o remount: option not supported\n
+    state: present
+
+- name: See if mfs is mounted
+  shell: mount -t mfs | cut -d ' ' -f 3
+  register: mount_mfs_mounted
+  changed_when: false
+  always_run: yes
+
+- name: Mount mfs
+  command: mount "{{ unbound_chroot_dev_dir }}"
+  when:
+    - not unbound_chroot_dev_dir in mount_mfs_mounted.stdout_lines
+  register: register_mount_unbound_chroot_dev_dir
+
+- name: Execute mk_chroot
+  command: "{{ unbound_script_dir }}/mk_chroot {{ unbound_config_chroot }}"
+  args:
+    creates: "{{ unbound_chroot_dev_dir }}/random"
+  when:
+    - register_mount_unbound_chroot_dev_dir.changed

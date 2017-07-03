@@ -21,4 +21,6 @@ galaxy_info:
   galaxy_tags:
     - DNS
     - unbound
-dependencies: []
+dependencies:
+  - role: reallyenglish.devfsrules
+    when: ansible_os_family == 'FreeBSD' and unbound_config_chroot is defined and unbound_config_chroot | length > 0

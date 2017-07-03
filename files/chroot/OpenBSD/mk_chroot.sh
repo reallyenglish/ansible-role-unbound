@@ -3,7 +3,6 @@ set -e
 
 chroot_dir="$1"
 chroot_dev_dir="${chroot_dir}/dev"
-mount_mfs -s 256k -o nosuid swap "${chroot_dev_dir}"
 
 (
   cd "${chroot_dev_dir}"; \

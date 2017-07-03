@@ -45,27 +45,6 @@ end
 
 case os[:family]
 when "freebsd"
-
-  describe file("/usr/local/etc/rc.d/chroot_unbound") do
-    it { should be_file }
-    it { should be_mode 755 }
-  end
-
-  describe file("/etc/rc.conf.d/chroot_unbound") do
-    it { should be_file }
-    its(:content) { should match(/chroot_unbound_enable="YES"/) }
-    its(:content) { should match(/chroot_unbound_flags="#{ Regexp.escape('/usr/local/etc/unbound') } 100"/) }
-  end
-
-  describe service("chroot_unbound") do
-    it { should be_enabled }
-  end
-
-  describe file("/usr/local/bin/mk_chroot") do
-    it { should be_file }
-    it { should be_mode 755 }
-  end
-
   describe file("#{chroot_dir}/dev") do
     it { should be_directory }
     it { should be_mounted }
@@ -73,17 +52,19 @@ when "freebsd"
 
   describe command("devfs -m #{chroot_dir}/dev rule show") do
     its(:exit_status) { should eq 0 }
-    its(:stdout) { should match(/^100 hide$/) }
-    its(:stdout) { should match(/^200 path random unhide$/) }
-    its(:stdout) { should match(/^300 path urandom unhide$/) }
+    its(:stdout) { should match(/^100 include 1$/) }
+    its(:stdout) { should match(/^200 include 2$/) }
+    its(:stdout) { should match(/^300 path random unhide$/) }
+    its(:stdout) { should match(/^400 path urandom unhide$/) }
     its(:stderr) { should eq "" }
   end
 
   describe command("devfs rule -s #{unbound_freebsd_chroot_devfs_ruleset_number} show") do
     its(:exit_status) { should eq 0 }
-    its(:stdout) { should match(/^100 hide$/) }
-    its(:stdout) { should match(/^200 path random unhide$/) }
-    its(:stdout) { should match(/^300 path urandom unhide$/) }
+    its(:stdout) { should match(/^100 include 1$/) }
+    its(:stdout) { should match(/^200 include 2$/) }
+    its(:stdout) { should match(/^300 path random unhide$/) }
+    its(:stdout) { should match(/^400 path urandom unhide$/) }
     its(:stderr) { should eq "" }
   end
 
@@ -108,6 +89,15 @@ when "freebsd"
   end
 
 when "openbsd"
+
+  describe file("/etc/fstab") do
+    its(:content) { should match(/^swap #{Regexp.escape("/var/unbound/dev")} mfs rw,nosuid,-s=256k 0 0/) }
+  end
+
+  describe command("mount") do
+    its(:exit_status) { should eq 0 }
+    its(:stdout) { should match(/^mfs:\d+ on #{Regexp.escape("/var/unbound/dev")} type mfs \(asynchronous, local, nosuid, size=512 512-blocks\)/) }
+  end
 
   describe file("#{chroot_dir}/dev") do
     it { should be_mounted }
