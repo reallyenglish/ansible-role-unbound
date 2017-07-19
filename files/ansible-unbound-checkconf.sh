@@ -26,6 +26,7 @@ config_file_to_validate="${1}"
 version=`unbound-checkconf -h | grep -e '^Version' | cut -f 2 -d ' ' | cut -f 1,2 -d '.'`
 
 case "${version}" in
+    1.6)    option="-f -o directory" ;;
     1.5)    option="-f -o directory" ;;
     1.4)    option="-o directory" ;;
     *)      echo "unknown unbound version ${version}" >2
