@@ -1,3 +1,7 @@
+## Release 2.1.0
+
+* 436a3e1 [feature][bugfix] Support unbound 1.6 and OpenBSD 6.1 (#36), closes #34
+
 ## Release 2.0.0
 
 * fccbfc6 [bugfix] use reallyenglish.devfsrules, remove chroot hacks (#32)
