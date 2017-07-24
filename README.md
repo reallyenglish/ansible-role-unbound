@@ -75,8 +75,8 @@ Here is a single-value example:
 
 ```yaml
 unbound_config_server:
-  name: use-syslog
-  value: "yes"
+  - name: use-syslog
+    value: "yes"
 ```
 
 Which generates:
@@ -90,10 +90,10 @@ Here is a multiple-values example:
 
 ```yaml
 unbound_config_server:
-  name: access-control
-  values:
-    - 0.0.0.0/0 refuse
-    - 127.0.0.0/8 allow
+  - name: access-control
+    values:
+      - 0.0.0.0/0 refuse
+      - 127.0.0.0/8 allow
 ```
 
 Which generates:
