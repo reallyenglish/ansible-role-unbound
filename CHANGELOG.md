@@ -1,3 +1,7 @@
+## Release 2.1.1
+
+* b91475b [bugfix] wrong examples in README (#39)
+
 ## Release 2.1.0
 
 * 436a3e1 [feature][bugfix] Support unbound 1.6 and OpenBSD 6.1 (#36), closes #34
