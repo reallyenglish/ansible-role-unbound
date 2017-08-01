@@ -11,6 +11,7 @@ keys = %w(unbound_server.key unbound_server.pem unbound_control.key unbound_cont
 script_dir = "/usr/bin"
 default_user = "root"
 default_group = "root"
+flags_file = ""
 
 case os[:family]
 when "freebsd"
@@ -18,6 +19,7 @@ when "freebsd"
   directory = "/usr/local/etc/unbound"
   script_dir = "/usr/local/bin"
   default_group = "wheel"
+  flags_file = "/etc/rc.conf.d/#{service}"
 when "openbsd"
   user = "_unbound"
   group = "_unbound"
@@ -25,10 +27,13 @@ when "openbsd"
   directory = "/var/unbound"
   script_dir = "/usr/local/bin"
   default_group = "wheel"
+  flags_file = "/etc/rc.conf.local"
 when "ubuntu"
   directory = "/etc/unbound"
+  flags_file = "/etc/default/#{service}"
 when "redhat"
   directory = "/etc/unbound"
+  flags_file = "/etc/sysconfig/#{service}"
 end
 config = "#{conf_dir}/unbound.conf"
 
@@ -38,41 +43,20 @@ if os[:family] != "openbsd"
   end
 end
 
-case os[:family]
-when "openbsd"
-  describe file("/etc/rc.conf.local") do
-    it { should exist }
-    it { should be_file }
-    it { should be_owned_by default_user }
-    it { should be_grouped_into default_group }
-    it { should be_mode 644 }
+describe file(flags_file) do
+  it { should exist }
+  it { should be_file }
+  it { should be_owned_by default_user }
+  it { should be_grouped_into default_group }
+  it { should be_mode 644 }
+  case os[:family]
+  when "openbsd"
     its(:content) { should match(/^unbound_flags=-v -c #{Regexp.escape(config)}$/) }
-  end
-when "redhat"
-  describe file("/etc/sysconfig/unbound") do
-    it { should exist }
-    it { should be_file }
-    it { should be_owned_by default_user }
-    it { should be_grouped_into default_group }
-    it { should be_mode 644 }
+  when "redhat"
     its(:content) { should match(/^UNBOUND_OPTIONS="-v -c #{Regexp.escape(config)}"$/) }
-  end
-when "ubuntu"
-  describe file("/etc/default/unbound") do
-    it { should exist }
-    it { should be_file }
-    it { should be_owned_by default_user }
-    it { should be_grouped_into default_group }
-    it { should be_mode 644 }
+  when "ubuntu"
     its(:content) { should match(/^DAEMON_OPTS="-v -c #{Regexp.escape(config)}"$/) }
-  end
-when "freebsd"
-  describe file("/etc/rc.conf.d/unbound") do
-    it { should exist }
-    it { should be_file }
-    it { should be_owned_by default_user }
-    it { should be_grouped_into default_group }
-    it { should be_mode 644 }
+  when "freebsd"
     its(:content) { should match(/^unbound_flags="-v -c #{Regexp.escape(config)}"$/) }
   end
 end
