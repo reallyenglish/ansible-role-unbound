@@ -3,11 +3,11 @@
     - ansible-role-unbound
   vars:
     debian_flags:
-      DAEMON_OPTS: "-c {{ unbound_conf_file }}"
+      DAEMON_OPTS: "-v -c {{ unbound_conf_file }}"
     freebsd_flags:
-      unbound_command_args: "-c {{ unbound_conf_file }}"
+      unbound_flags: "-v -c {{ unbound_conf_file }}"
     redhat_flags:
-      UNBOUND_OPTIONS: "-c {{ unbound_conf_file }}"
+      UNBOUND_OPTIONS: "-v -c {{ unbound_conf_file }}"
     openbsd_flags:
       flags: "-v -c {{ unbound_conf_file }}"
 

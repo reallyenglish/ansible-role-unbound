@@ -55,7 +55,7 @@ when "redhat"
     it { should be_owned_by default_user }
     it { should be_grouped_into default_group }
     it { should be_mode 644 }
-    its(:content) { should match(/^UNBOUND_OPTIONS="-c #{Regexp.escape(config)}"$/) }
+    its(:content) { should match(/^UNBOUND_OPTIONS="-v -c #{Regexp.escape(config)}"$/) }
   end
 when "ubuntu"
   describe file("/etc/default/unbound") do
@@ -64,7 +64,7 @@ when "ubuntu"
     it { should be_owned_by default_user }
     it { should be_grouped_into default_group }
     it { should be_mode 644 }
-    its(:content) { should match(/^DAEMON_OPTS="-c #{Regexp.escape(config)}"$/) }
+    its(:content) { should match(/^DAEMON_OPTS="-v -c #{Regexp.escape(config)}"$/) }
   end
 when "freebsd"
   describe file("/etc/rc.conf.d/unbound") do
@@ -73,7 +73,7 @@ when "freebsd"
     it { should be_owned_by default_user }
     it { should be_grouped_into default_group }
     it { should be_mode 644 }
-    its(:content) { should match(/^unbound_command_args="-c #{Regexp.escape(config)}"$/) }
+    its(:content) { should match(/^unbound_flags="-v -c #{Regexp.escape(config)}"$/) }
   end
 end
 
@@ -141,6 +141,26 @@ end
 describe service(service) do
   it { should be_running }
   it { should be_enabled }
+end
+
+describe process("unbound") do
+  its(:user) do
+    pending "due to a bug in serverspec, this does not work on BSDs" if os[:family] == "freebsd" || os[:family] == "openbsd"
+    should eq user
+  end
+  its(:args) do
+    pending "due to a bug in serverspec, this does not work on BSDs" if os[:family] == "freebsd" || os[:family] == "openbsd"
+    should match(/-v -c #{Regexp.escape(config)}/)
+  end
+end
+case os[:family]
+when /bsd$/
+  # workaround for the above issue
+  describe command("ps -ax -o user,args") do
+    its(:exit_status) { should eq 0 }
+    its(:stderr) { should eq "" }
+    its(:stdout) { should match(/^#{user}\s+(?:#{Regexp.escape("/usr/local/sbin/")})?#{Regexp.escape("unbound -v -c #{config}")}$/) }
+  end
 end
 
 ports.each do |p|
