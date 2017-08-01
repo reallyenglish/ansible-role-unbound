@@ -23,7 +23,7 @@ None
 | `unbound_service` | service name of `unbound` | `unbound` |
 | `unbound_conf_dir` | path to config directory | `{{ __unbound_conf_dir }}` |
 | `unbound_conf_file` | path to `unbound.conf(5)` | `{{ unbound_conf_dir }}/unbound.conf` |
-| `unbound_flags` | dict of variables and their values in startup scripts. this variable overrides `unbound_flags_default` (see below). | `{}` |
+| `unbound_flags` | dict of variables and their values in startup scripts. this variable is combined with `unbound_flags_default` (see below). | `{}` |
 | `unbound_flags_default` | dict of default variables and their values in startup scripts | `{{ __unbound_flags_default }}` |
 | `unbound_script_dir` | directory to install scripts in `files` | `{{ __unbound_script_dir }}` |
 | `unbound_directory` | work directory of `unbound` | `{{ __unbound_directory }}` |
