@@ -38,6 +38,45 @@ if os[:family] != "openbsd"
   end
 end
 
+case os[:family]
+when "openbsd"
+  describe file("/etc/rc.conf.local") do
+    it { should exist }
+    it { should be_file }
+    it { should be_owned_by default_user }
+    it { should be_grouped_into default_group }
+    it { should be_mode 644 }
+    its(:content) { should match(/^unbound_flags=-v -c #{Regexp.escape(config)}$/) }
+  end
+when "redhat"
+  describe file("/etc/sysconfig/unbound") do
+    it { should exist }
+    it { should be_file }
+    it { should be_owned_by default_user }
+    it { should be_grouped_into default_group }
+    it { should be_mode 644 }
+    its(:content) { should match(/^UNBOUND_OPTIONS="-c #{Regexp.escape(config)}"$/) }
+  end
+when "ubuntu"
+  describe file("/etc/default/unbound") do
+    it { should exist }
+    it { should be_file }
+    it { should be_owned_by default_user }
+    it { should be_grouped_into default_group }
+    it { should be_mode 644 }
+    its(:content) { should match(/^DAEMON_OPTS="-c #{Regexp.escape(config)}"$/) }
+  end
+when "freebsd"
+  describe file("/etc/rc.conf.d/unbound") do
+    it { should exist }
+    it { should be_file }
+    it { should be_owned_by default_user }
+    it { should be_grouped_into default_group }
+    it { should be_mode 644 }
+    its(:content) { should match(/^unbound_command_args="-c #{Regexp.escape(config)}"$/) }
+  end
+end
+
 describe user(user) do
   it { should exist }
   it { should belong_to_primary_group group }

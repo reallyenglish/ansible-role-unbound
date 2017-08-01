@@ -1,0 +1,8 @@
+---
+- debug:
+    var: unbound_flags_merged['flags']
+- name: Enable unbound
+  service:
+    name: "{{ unbound_service }}"
+    arguments: "{{ unbound_flags_merged.flags }}"
+    enabled: yes

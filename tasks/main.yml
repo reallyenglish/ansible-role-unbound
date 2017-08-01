@@ -5,7 +5,12 @@
 
 - include: deprecate.yml
 
+- set_fact:
+    unbound_flags_merged: "{{ unbound_flags_default | combine(unbound_flags) }}"
+
 - include: "install-{{ ansible_os_family }}.yml"
+
+- include: "configure-{{ ansible_os_family }}.yml"
 
 - name: Register unbound version
   shell: "unbound -h | grep -E '^Version[[:space:]]+[[:digit:].]+$' | cut -f 2 -d' '"
@@ -91,5 +96,4 @@
 - name: Start unbound
   service:
     name: "{{ unbound_service }}"
-    enabled: true
     state: started

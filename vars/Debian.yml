@@ -3,3 +3,4 @@ __unbound_group: unbound
 __unbound_conf_dir: /etc/unbound
 __unbound_script_dir: /usr/bin
 __unbound_directory: /etc/unbound
+__unbound_flags_default: {}

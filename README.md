@@ -23,7 +23,8 @@ None
 | `unbound_service` | service name of `unbound` | `unbound` |
 | `unbound_conf_dir` | path to config directory | `{{ __unbound_conf_dir }}` |
 | `unbound_conf_file` | path to `unbound.conf(5)` | `{{ unbound_conf_dir }}/unbound.conf` |
-| `unbound_flags` | (not implemented yet) | `""` |
+| `unbound_flags` | dict of variables and their values in startup scripts. this variable overrides `unbound_flags_default` (see below). | `{}` |
+| `unbound_flags_default` | dict of default variables and their values in startup scripts | `{{ __unbound_flags_default }}` |
 | `unbound_script_dir` | directory to install scripts in `files` | `{{ __unbound_script_dir }}` |
 | `unbound_directory` | work directory of `unbound` | `{{ __unbound_directory }}` |
 | `unbound_config_chroot` | path to `chroo(2)` directory | `""` |
@@ -39,6 +40,16 @@ None
 | `unbound_config_remote_control_extra` | list of extra settings in `remote-control` | `[]` |
 | `unbound_forward_zone` | list of settings in `forward-zone` (see below) | `[]` |
 | `unbound_stub_zone` | list of settings in `stub-zone` (see below) | `[]` |
+
+## `unbound_flags`
+
+This variable is a dict with variable name in startup scripts, such as
+`/etc/sysconfig/unbound`, as key and variable value as a value. Accepted keys
+and values are platform-dependent. See the Example Playbook.
+
+In case of OpenBSD, the only acceptable key is `flags`. The value is passed to
+`unbound_flags` in `rc.conf.local(5)` when the value is different from the
+default.
 
 ## `unbound_config_server`
 
@@ -146,6 +157,7 @@ unbound_stub_zone:
 | `__unbound_conf_dir` | `/etc/unbound` |
 | `__unbound_script_dir` | `/usr/bin` |
 | `__unbound_directory` | `/etc/unbound` |
+| `__unbound_flags_default` | `{}` |
 
 ## FreeBSD
 
@@ -156,6 +168,7 @@ unbound_stub_zone:
 | `__unbound_conf_dir` | `/usr/local/etc/unbound` |
 | `__unbound_script_dir` | `/usr/local/bin` |
 | `__unbound_directory` | `/usr/local/etc/unbound` |
+| `__unbound_flags_default` | `{}` |
 
 ## OpenBSD
 
@@ -166,6 +179,7 @@ unbound_stub_zone:
 | `__unbound_conf_dir` | `/var/unbound/etc` |
 | `__unbound_script_dir` | `/usr/local/bin` |
 | `__unbound_directory` | `/var/unbound` |
+| `__unbound_flags_default` | `{"flags"=>""}` |
 
 ## RedHat
 
@@ -176,6 +190,7 @@ unbound_stub_zone:
 | `__unbound_conf_dir` | `/etc/unbound` |
 | `__unbound_script_dir` | `/usr/bin` |
 | `__unbound_directory` | `/etc/unbound` |
+| `__unbound_flags_default` | `{"UNBOUND_OPTIONS"=>""}` |
 
 # Dependencies
 
@@ -188,6 +203,17 @@ None
   roles:
     - ansible-role-unbound
   vars:
+    debian_flags:
+      DAEMON_OPTS: "-c {{ unbound_conf_file }}"
+    freebsd_flags:
+      unbound_command_args: "-c {{ unbound_conf_file }}"
+    redhat_flags:
+      UNBOUND_OPTIONS: "-c {{ unbound_conf_file }}"
+    openbsd_flags:
+      flags: "-v -c {{ unbound_conf_file }}"
+
+    unbound_flags: "{% if ansible_os_family == 'Debian' %}{{ debian_flags }}{% elif ansible_os_family == 'FreeBSD' %}{{ freebsd_flags }}{% elif ansible_os_family == 'RedHat' %}{{ redhat_flags }}{% elif ansible_os_family == 'OpenBSD' %}{{ openbsd_flags }}{% endif %}"
+
     unbound_config_chroot: ""
     unbound_config_server:
       - "outgoing-interface: {{ ansible_default_ipv4.address }}"
@@ -199,11 +225,8 @@ None
       # you may use dict, too
       - name: use-syslog
         value: "yes"
-      - name: interface
-        # some settings are allowed to appear multiple times, which makes
-        # `unbound.conf(5)` different from YAML. use `values`, not `value`
-        values:
-          - "{{ ansible_default_ipv4.address }}"
+      # some settings are allowed to appear multiple times, which makes
+      # `unbound.conf(5)` different from YAML.
       - name: local-zone
         values:
           - 10.in-addr.arpa nodefault
@@ -225,6 +248,11 @@ None
       - name: private-domain
         values:
           - '"example.com"'
+      # if `values` has a single value, you may use `values`, which is not
+      # recommended. prefer `value` to `values` in this case.
+      - name: interface
+        values:
+          - "{{ ansible_default_ipv4.address }}"
     # unbound in ubuntu 14.04 does not support unix socket
     unbound_config_remote_control_control_interface: "{% if (ansible_distribution == 'Ubuntu' and ansible_distribution_version | version_compare('14.04', '<=')) or (ansible_distribution == 'CentOS' and ansible_distribution_version | version_compare('7.3.1611', '<=')) %}127.0.0.1{% else %}/var/run/unbound.sock{% endif %}"
     unbound_forward_zone:

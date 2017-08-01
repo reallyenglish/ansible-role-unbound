@@ -3,7 +3,8 @@ unbound_group: "{{ __unbound_group }}"
 unbound_service: unbound
 unbound_conf_dir: "{{ __unbound_conf_dir }}"
 unbound_conf_file: "{{ unbound_conf_dir }}/unbound.conf"
-unbound_flags: ""
+unbound_flags: {}
+unbound_flags_default: "{{ __unbound_flags_default }}"
 unbound_script_dir: "{{ __unbound_script_dir }}"
 
 unbound_directory: "{{ __unbound_directory }}"

@@ -2,6 +2,17 @@
   roles:
     - ansible-role-unbound
   vars:
+    debian_flags:
+      DAEMON_OPTS: "-c {{ unbound_conf_file }}"
+    freebsd_flags:
+      unbound_command_args: "-c {{ unbound_conf_file }}"
+    redhat_flags:
+      UNBOUND_OPTIONS: "-c {{ unbound_conf_file }}"
+    openbsd_flags:
+      flags: "-v -c {{ unbound_conf_file }}"
+
+    unbound_flags: "{% if ansible_os_family == 'Debian' %}{{ debian_flags }}{% elif ansible_os_family == 'FreeBSD' %}{{ freebsd_flags }}{% elif ansible_os_family == 'RedHat' %}{{ redhat_flags }}{% elif ansible_os_family == 'OpenBSD' %}{{ openbsd_flags }}{% endif %}"
+
     unbound_config_chroot: ""
     unbound_config_server:
       - "outgoing-interface: {{ ansible_default_ipv4.address }}"
