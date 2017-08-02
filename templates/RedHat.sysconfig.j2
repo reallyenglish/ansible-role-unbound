@@ -1,0 +1,5 @@
+# Managed by ansible
+
+{% for k, v in unbound_flags_merged | dictsort() %}
+{{ k }}="{{ v }}"
+{% endfor %}

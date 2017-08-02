@@ -1,0 +1,14 @@
+---
+
+- name: Create /etc/rc.conf.d/unbound
+  template:
+    src: FreeBSD.rcd.j2
+    dest: /etc/rc.conf.d/unbound
+    mode: 0644
+    validate: sh -n %s
+  notify: Restart unbound
+
+- name: Enable unbound
+  service:
+    name: "{{ unbound_service }}"
+    enabled: yes

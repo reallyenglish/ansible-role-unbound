@@ -11,6 +11,7 @@ keys = %w(unbound_server.key unbound_server.pem unbound_control.key unbound_cont
 script_dir = "/usr/bin"
 default_user = "root"
 default_group = "root"
+flags_file = ""
 
 case os[:family]
 when "freebsd"
@@ -18,6 +19,7 @@ when "freebsd"
   directory = "/usr/local/etc/unbound"
   script_dir = "/usr/local/bin"
   default_group = "wheel"
+  flags_file = "/etc/rc.conf.d/#{service}"
 when "openbsd"
   user = "_unbound"
   group = "_unbound"
@@ -25,16 +27,37 @@ when "openbsd"
   directory = "/var/unbound"
   script_dir = "/usr/local/bin"
   default_group = "wheel"
+  flags_file = "/etc/rc.conf.local"
 when "ubuntu"
   directory = "/etc/unbound"
+  flags_file = "/etc/default/#{service}"
 when "redhat"
   directory = "/etc/unbound"
+  flags_file = "/etc/sysconfig/#{service}"
 end
 config = "#{conf_dir}/unbound.conf"
 
 if os[:family] != "openbsd"
   describe package(package) do
     it { should be_installed }
+  end
+end
+
+describe file(flags_file) do
+  it { should exist }
+  it { should be_file }
+  it { should be_owned_by default_user }
+  it { should be_grouped_into default_group }
+  it { should be_mode 644 }
+  case os[:family]
+  when "openbsd"
+    its(:content) { should match(/^unbound_flags=-v -c #{Regexp.escape(config)}$/) }
+  when "redhat"
+    its(:content) { should match(/^UNBOUND_OPTIONS="-v -c #{Regexp.escape(config)}"$/) }
+  when "ubuntu"
+    its(:content) { should match(/^DAEMON_OPTS="-v -c #{Regexp.escape(config)}"$/) }
+  when "freebsd"
+    its(:content) { should match(/^unbound_flags="-v -c #{Regexp.escape(config)}"$/) }
   end
 end
 
@@ -102,6 +125,26 @@ end
 describe service(service) do
   it { should be_running }
   it { should be_enabled }
+end
+
+describe process("unbound") do
+  its(:user) do
+    pending "due to a bug in serverspec, this does not work on BSDs" if os[:family] == "freebsd" || os[:family] == "openbsd"
+    should eq user
+  end
+  its(:args) do
+    pending "due to a bug in serverspec, this does not work on BSDs" if os[:family] == "freebsd" || os[:family] == "openbsd"
+    should match(/-v -c #{Regexp.escape(config)}/)
+  end
+end
+case os[:family]
+when /bsd$/
+  # workaround for the above issue
+  describe command("ps -ax -o user,args") do
+    its(:exit_status) { should eq 0 }
+    its(:stderr) { should eq "" }
+    its(:stdout) { should match(/^#{user}\s+(?:#{Regexp.escape("/usr/local/sbin/")})?#{Regexp.escape("unbound -v -c #{config}")}$/) }
+  end
 end
 
 ports.each do |p|

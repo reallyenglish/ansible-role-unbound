@@ -1,0 +1,15 @@
+---
+
+- name: Create /etc/sysconfig/unbound
+  template:
+    src: RedHat.sysconfig.j2
+    dest: /etc/sysconfig/unbound
+    mode: 0644
+    backup: yes
+    validate: sh -n %s
+  notify: Restart unbound
+
+- name: Enable unbound
+  service:
+    name: "{{ unbound_service }}"
+    enabled: yes
