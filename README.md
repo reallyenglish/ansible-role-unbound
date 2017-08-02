@@ -43,13 +43,29 @@ None
 
 ## `unbound_flags`
 
-This variable is a dict with variable name in startup scripts, such as
-`/etc/sysconfig/unbound`, as key and variable value as a value. Accepted keys
-and values are platform-dependent. See the Example Playbook.
+This variable is a dict of variables of startup configuration files, such as
+files under `/etc/default`, `/etc/sysconfig`, and `/etc/rc.conf.d`. It is
+assumed that the files are `source`d by startup mechanism with `sh(1)`. A key
+in the dict is name of the variable in the file, and the value of the key is
+value of the variable. The variable is combined with a variable whose name is
+same as this variable, but postfixed with `_default` (explained below) and the
+result creates the startup configuration file, usually a file consisting of
+lines of `key="value"` under appropriate directory for the platform.
 
-In case of OpenBSD, the only acceptable key is `flags`. The value is passed to
-`unbound_flags` in `rc.conf.local(5)` when the value is different from the
-default.
+When the platform is OpenBSD, the above explanation does not apply. In this
+case, the only valid key is `flags` and the value of it is passed to
+`daemon_flags` described in [`rc.conf(5)`](http://man.openbsd.org/rc.conf),
+where `daemon` is the name of one of the `rc.d(8)` daemon control scripts.
+
+## `unbound_flags_default`
+
+This variable is a dict of keys and values derived from upstream's default
+configuration, and is supposed to be a constant unless absolutely necessary. By
+default, the role creates a startup configuration file for each platform with
+this variable, identical to default one.
+
+When the platform is OpenBSD, the variable has a single key, `flags` and its
+value is empty string.
 
 ## `unbound_config_server`
 
