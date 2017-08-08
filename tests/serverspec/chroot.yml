@@ -4,8 +4,6 @@
     - name: reallyenglish.devfsrules
       when:
         - ansible_os_family == 'FreeBSD'
-        - unbound_config_chroot is defined
-        - unbound_config_chroot | length > 0
   vars:
     chroot_dir: "{% if ansible_os_family == 'OpenBSD' %}/var/unbound{% elif ansible_os_family == 'FreeBSD' %}/usr/local/etc/unbound{% endif %}"
 
