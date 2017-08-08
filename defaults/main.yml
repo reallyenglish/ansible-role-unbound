@@ -8,6 +8,7 @@ unbound_flags_default: "{{ __unbound_flags_default }}"
 unbound_script_dir: "{{ __unbound_script_dir }}"
 
 unbound_directory: "{{ __unbound_directory }}"
+unbound_include_role_x509_certificate: no
 unbound_config_chroot: ""
 unbound_freebsd_chroot_devfs_ruleset_number: 100
 

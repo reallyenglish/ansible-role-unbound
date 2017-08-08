@@ -86,3 +86,16 @@ suites:
       - freebsd-10.3-amd64
       - openbsd-6.0-amd64
       - openbsd-6.1-amd64
+
+  - name: x509
+    provisioner:
+      name: ansible_playbook
+      playbook: tests/serverspec/x509.yml
+    verifier:
+      name: shell
+      command: rspec -c -f d -I tests/serverspec tests/serverspec/x509_spec.rb
+    includes:
+      # this test is intended to be a test that ensures the role includes
+      # `x509-certificate` when told so, which is specific to the role, not
+      # platforms. thus, testing on a signle platform is sufficient.
+      - freebsd-10.3-amd64

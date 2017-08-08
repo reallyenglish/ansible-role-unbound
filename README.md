@@ -10,6 +10,11 @@ unbound. Supported platform includes:
 * OpenBSD
 * FreeBSD
 
+The implementation of `unbound_config_chroot` is quite hackish and is subject
+to change.
+
+See `tests/serverspec/chroot.yml` for the details.
+
 # Requirements
 
 None
@@ -27,6 +32,7 @@ None
 | `unbound_flags_default` | dict of default variables and their values in startup scripts | `{{ __unbound_flags_default }}` |
 | `unbound_script_dir` | directory to install scripts in `files` | `{{ __unbound_script_dir }}` |
 | `unbound_directory` | work directory of `unbound` | `{{ __unbound_directory }}` |
+| `unbound_include_role_x509_certificate` | include and execute `reallyenglish.x509-certificate` when true | `no` |
 | `unbound_config_chroot` | path to `chroo(2)` directory | `""` |
 | `unbound_freebsd_chroot_devfs_ruleset_number` | `devfs(8)` rule set number. Change when `unbound_config_chroot` is not empty and you have other `devfs(8)` rule set with the same number. | `100` |
 | `unbound_config_server` | list of settings in `server` section (see below) | `[]` |

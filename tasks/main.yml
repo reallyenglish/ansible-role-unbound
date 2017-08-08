@@ -10,6 +10,10 @@
 
 - include: "install-{{ ansible_os_family }}.yml"
 
+- include: "x509.yml"
+  when:
+    - unbound_include_role_x509_certificate
+
 - include: "configure-{{ ansible_os_family }}.yml"
 
 - name: Register unbound version
