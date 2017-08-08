@@ -10,6 +10,11 @@ unbound. Supported platform includes:
 * OpenBSD
 * FreeBSD
 
+The implementation of `unbound_config_chroot` is quite hackish and is subject
+to change.
+
+See `tests/serverspec/chroot.yml` for the details.
+
 # Requirements
 
 None
