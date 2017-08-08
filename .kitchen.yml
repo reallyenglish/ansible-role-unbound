@@ -96,6 +96,6 @@ suites:
       command: rspec -c -f d -I tests/serverspec tests/serverspec/x509_spec.rb
     includes:
       # this test is intended to be a test that ensures the role includes
-      # `x509-certificate` when told so, which is specific to the role, nbot
+      # `x509-certificate` when told so, which is specific to the role, not
       # platforms. thus, testing on a signle platform is sufficient.
       - freebsd-10.3-amd64
