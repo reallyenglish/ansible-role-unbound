@@ -129,11 +129,11 @@ end
 
 describe process("unbound") do
   its(:user) do
-    pending "due to a bug in serverspec, this does not work on BSDs" if os[:family] == "freebsd" || os[:family] == "openbsd"
+    pending "due to a bug in serverspec, this does not work on OpenBSD" if os[:family] == "openbsd"
     should eq user
   end
   its(:args) do
-    pending "due to a bug in serverspec, this does not work on BSDs" if os[:family] == "freebsd" || os[:family] == "openbsd"
+    pending "due to a bug in serverspec, this does not work on OpenBSD" if os[:family] == "openbsd"
     should match(/-v -c #{Regexp.escape(config)}/)
   end
 end
