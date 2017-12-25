@@ -7,7 +7,7 @@ group   = "unbound"
 ports   = [53]
 conf_dir = "/etc/unbound"
 directory = ""
-keys = %w(unbound_server.key unbound_server.pem unbound_control.key unbound_control.pem)
+keys = %w[unbound_server.key unbound_server.pem unbound_control.key unbound_control.pem]
 script_dir = "/usr/bin"
 chroot_dir = ""
 unbound_freebsd_chroot_devfs_ruleset_number = 100
@@ -74,10 +74,10 @@ when "freebsd"
     its(:stderr) { should eq "" }
   end
 
-  devices = %w(
+  devices = %w[
     random
     urandom
-  )
+  ]
   devices.each do |dev|
     describe file("#{chroot_dir}/dev/#{dev}") do
       it { should be_character_device }
@@ -103,14 +103,14 @@ when "openbsd"
     it { should be_mounted }
   end
 
-  devices = %w(
+  devices = %w[
     random
     null
     zero
     stdin
     stdout
     stderr
-  )
+  ]
   devices.each do |dev|
     describe file("#{chroot_dir}/dev/#{dev}") do
       it { should be_character_device }

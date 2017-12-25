@@ -7,7 +7,7 @@ group   = "unbound"
 ports   = [53]
 conf_dir = "/etc/unbound"
 directory = ""
-keys = %w(unbound_server.key unbound_server.pem unbound_control.key unbound_control.pem)
+keys = %w[unbound_server.key unbound_server.pem unbound_control.key unbound_control.pem]
 script_dir = "/usr/bin"
 default_user = "root"
 default_group = "root"
@@ -89,7 +89,7 @@ describe file(config) do
   its(:content) { should match(/access-control: #{ Regexp.escape('10.100.1.0/24 allow') }/) }
   its(:content) { should match(/local-zone:\s+10\.in-addr\.arpa nodefault\n/) }
   its(:content) { should match(/local-zone:\s+168\.192\.in-addr\.arpa nodefault\n/) }
-  %w(10.0.0.0/8 172.16.0.0/12 192.168.0.0/16 192.254.0.0/16 fc00::/7 fd00::/8 fe80::/10).each do |addr|
+  %w[10.0.0.0/8 172.16.0.0/12 192.168.0.0/16 192.254.0.0/16 fc00::/7 fd00::/8 fe80::/10].each do |addr|
     its(:content) { should match(/private-address: #{ Regexp.escape(addr) }/) }
   end
   its(:content) { should match(/private-domain: "example\.com"/) }
