@@ -57,7 +57,7 @@
   shell: mount -t mfs | cut -d ' ' -f 3
   register: mount_mfs_mounted
   changed_when: false
-  always_run: yes
+  check_mode: no
 
 - name: Mount mfs
   command: mount "{{ unbound_chroot_dev_dir }}"
